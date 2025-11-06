@@ -1,0 +1,42 @@
+# Source files
+src/
+
+# Tests
+tests/
+*.test.ts
+*.spec.ts
+
+# Benchmarks
+benchmarks/
+
+# Examples
+examples/
+
+# Coverage
+coverage/
+
+# Config files
+tsconfig.json
+tsconfig.build.json
+.prettierrc
+vitest.config.ts
+typedoc.json
+
+# CI/CD
+.github/
+
+# Editor
+.vscode/
+.idea/
+
+# Docs source (keep generated docs)
+docs/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Misc
+*.log
+.DS_Store
