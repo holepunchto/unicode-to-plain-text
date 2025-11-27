@@ -247,6 +247,17 @@ test('Options - skipEmoji preserves emojis', (t) => {
     t.is(toPlainText('Sparkles ✨ test', { skipEmoji: true }), 'Sparkles ✨ test', 'preserves sparkles emoji')
 })
 
+test('Options - skipEmoji preserves all common emojis', (t) => {
+    t.is(toPlainText('Done ✅ test', { skipEmoji: true }), 'Done ✅ test', 'preserves green checkmark')
+    t.is(toPlainText('Error ❌ test', { skipEmoji: true }), 'Error ❌ test', 'preserves red cross')
+    t.is(toPlainText('Weather ☀️ test', { skipEmoji: true }), 'Weather ☀️ test', 'preserves sun emoji')
+    t.is(toPlainText('Love ❤️ test', { skipEmoji: true }), 'Love ❤️ test', 'preserves heart emoji')
+    t.is(toPlainText('Hands ✌️ test', { skipEmoji: true }), 'Hands ✌️ test', 'preserves victory hand')
+    t.is(toPlainText('Warning ⚠️ test', { skipEmoji: true }), 'Warning ⚠️ test', 'preserves warning emoji')
+    t.is(toPlainText('Stop ⛔ test', { skipEmoji: true }), 'Stop ⛔ test', 'preserves stop sign')
+    t.is(toPlainText('Info ℹ️ test', { skipEmoji: true }), 'Info ℹ️ test', 'preserves info emoji')
+})
+
 test('Options - skipEmoji still removes other decorations', (t) => {
     t.is(toPlainText('Hello ░▒▓ World', { skipEmoji: true }), 'Hello World', 'removes block chars')
     t.is(toPlainText('Test ═══ done', { skipEmoji: true }), 'Test done', 'removes box drawing')
@@ -267,4 +278,42 @@ test('Options - skipEmoji with fancy text', (t) => {
 test('Options - skipEmoji combined with normalizeSpaces', (t) => {
     t.is(toPlainText('Hello   🎉   World', { skipEmoji: true, normalizeSpaces: true }), 'Hello 🎉 World', 'both options work together')
     t.is(toPlainText('Hello   🎉   World', { skipEmoji: true, normalizeSpaces: false }), 'Hello   🎉   World', 'skipEmoji with spaces preserved')
+})
+
+test('Options - skipEmoji preserves all emoji categories', (t) => {
+    // Smileys & Emotion (U+1F600 range)
+    t.is(toPlainText('😀😂🥰😎🤔', { skipEmoji: true }), '😀😂🥰😎🤔', 'preserves smileys')
+
+    // People & Body (U+1F400+ range)
+    t.is(toPlainText('👍👎👋🤝✋', { skipEmoji: true }), '👍👎👋🤝✋', 'preserves hand gestures')
+
+    // Animals & Nature (U+1F400 range)
+    t.is(toPlainText('🐶🐱🐼🦁🌸', { skipEmoji: true }), '🐶🐱🐼🦁🌸', 'preserves animals and nature')
+
+    // Food & Drink (U+1F300 range)
+    t.is(toPlainText('🍎🍕🍔🍺🍷', { skipEmoji: true }), '🍎🍕🍔🍺🍷', 'preserves food and drink')
+
+    // Travel & Places (U+1F680 range)
+    t.is(toPlainText('🚗🚀✈️🏠🌍', { skipEmoji: true }), '🚗🚀✈️🏠🌍', 'preserves travel and places')
+
+    // Activities (U+1F3A0 range)
+    t.is(toPlainText('⚽🏀🎮🎬🎤', { skipEmoji: true }), '⚽🏀🎮🎬🎤', 'preserves activities')
+
+    // Objects (U+1F4A0 range)
+    t.is(toPlainText('💡📱💻⌚📷', { skipEmoji: true }), '💡📱💻⌚📷', 'preserves objects')
+
+    // Symbols - Misc Symbols U+2600 range
+    t.is(toPlainText('☀️☁️⚡☔⭐', { skipEmoji: true }), '☀️☁️⚡☔⭐', 'preserves weather symbols')
+
+    // Symbols - Hearts & Shapes U+2700 range
+    t.is(toPlainText('❤️💛💚💙💜', { skipEmoji: true }), '❤️💛💚💙💜', 'preserves hearts')
+
+    // Symbols - Status indicators
+    t.is(toPlainText('✅❌⚠️🔴🟢', { skipEmoji: true }), '✅❌⚠️🔴🟢', 'preserves status indicators')
+
+    // Symbols - Arrows and misc from Dingbats U+2700 range
+    t.is(toPlainText('✨✔️✖️❗❓', { skipEmoji: true }), '✨✔️✖️❗❓', 'preserves dingbat emojis')
+
+    // Flags (U+1F1E0 range)
+    t.is(toPlainText('🏳️🏴🚩', { skipEmoji: true }), '🏳️🏴🚩', 'preserves flags')
 })
