@@ -9,6 +9,14 @@ import { normalizeSpaces } from './normalizeSpaces'
 import { isAsciiOnly } from './isAsciiOnly'
 import { handleFlipped } from './handleFlipped'
 
+type ToPlainTextOptions = {
+  normalizeSpaces?: boolean
+}
+
+const DEFAULT_OPTIONS: ToPlainTextOptions = {
+  normalizeSpaces: true
+}
+
 /**
  * Converts fancy Unicode text to plain ASCII.
  *
@@ -32,19 +40,22 @@ import { handleFlipped } from './handleFlipped'
  *
  * @see {@link https://github.com/holepunchto/unicode-to-plain-text}
  */
-export const toPlainText = (text: string): string => {
+export const toPlainText = (text: string, options = DEFAULT_OPTIONS): string => {
   const validated = validateInput(text)
 
+  const normalizeSpacesHandler = options?.normalizeSpaces ? normalizeSpaces : (text: string) => text 
+
   if (isAsciiOnly(validated)) {
-    return pipe(handleUnicodeId, normalizeSpaces)(validated)
+    return pipe(handleUnicodeId, normalizeSpacesHandler)(validated)
   }
 
-  return pipe(
+
+return pipe(
     handleFlipped,
     mapCharacters,
     normalizeUnicode,
     removeDecorations,
-    normalizeSpaces,
+    normalizeSpacesHandler,
     normalizeCasing
   )(validated)
 }
