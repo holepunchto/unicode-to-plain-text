@@ -9,12 +9,14 @@ import { normalizeSpaces } from './normalizeSpaces'
 import { isAsciiOnly } from './isAsciiOnly'
 import { handleFlipped } from './handleFlipped'
 
-type ToPlainTextOptions = {
+export type ToPlainTextOptions = {
   normalizeSpaces?: boolean
+  skipEmoji?: boolean
 }
 
 const DEFAULT_OPTIONS: ToPlainTextOptions = {
-  normalizeSpaces: true
+  normalizeSpaces: true,
+  skipEmoji: false
 }
 
 /**
@@ -43,18 +45,23 @@ const DEFAULT_OPTIONS: ToPlainTextOptions = {
 export const toPlainText = (text: string, options = DEFAULT_OPTIONS): string => {
   const validated = validateInput(text)
 
-  const normalizeSpacesHandler = options?.normalizeSpaces ? normalizeSpaces : (text: string) => text 
+  const normalizeSpacesHandler =
+    (options?.normalizeSpaces ?? DEFAULT_OPTIONS.normalizeSpaces)
+      ? normalizeSpaces
+      : (text: string) => text
+
+  const removeDecorationsHandler = (text: string) =>
+    removeDecorations(text, { skipEmoji: options?.skipEmoji ?? DEFAULT_OPTIONS.skipEmoji })
 
   if (isAsciiOnly(validated)) {
     return pipe(handleUnicodeId, normalizeSpacesHandler)(validated)
   }
 
-
-return pipe(
+  return pipe(
     handleFlipped,
     mapCharacters,
     normalizeUnicode,
-    removeDecorations,
+    removeDecorationsHandler,
     normalizeSpacesHandler,
     normalizeCasing
   )(validated)

@@ -238,3 +238,33 @@ test('Options - enable normalizeSpaces with fancy text', (t) => {
     t.is(toPlainText('ⓗⓔⓛⓛⓞ  ⓦⓞⓡⓛⓓ'), 'hello world', 'should map fancy chars but preserve extra spaces (round bubble letters)')
     t.is(toPlainText(' 𝔥𝔢𝔩𝔩𝔬   𝔴𝔬𝔯𝔩𝔡 '), 'hello world', 'should map fancy chars but preserve extra spaces (gotic letters)')
 })
+
+test('Options - skipEmoji preserves emojis', (t) => {
+    t.is(toPlainText('Hello 🎉 World', { skipEmoji: true }), 'Hello 🎉 World', 'preserves celebration emoji')
+    t.is(toPlainText('Test ⭐ 💫 🌟', { skipEmoji: true }), 'Test ⭐ 💫 🌟', 'preserves star emojis')
+    t.is(toPlainText('🐋🐬 ocean', { skipEmoji: true }), '🐋🐬 ocean', 'preserves animal emojis')
+    t.is(toPlainText('Music 🎵🎶🎸', { skipEmoji: true }), 'Music 🎵🎶🎸', 'preserves music emojis')
+    t.is(toPlainText('Sparkles ✨ test', { skipEmoji: true }), 'Sparkles ✨ test', 'preserves sparkles emoji')
+})
+
+test('Options - skipEmoji still removes other decorations', (t) => {
+    t.is(toPlainText('Hello ░▒▓ World', { skipEmoji: true }), 'Hello World', 'removes block chars')
+    t.is(toPlainText('Test ═══ done', { skipEmoji: true }), 'Test done', 'removes box drawing')
+    t.is(toPlainText('♔♕♖ chess', { skipEmoji: true }), 'chess', 'removes chess pieces')
+    t.is(toPlainText('Arrow → test', { skipEmoji: true }), 'Arrow test', 'removes arrows')
+})
+
+test('Options - skipEmoji false (default) removes emojis', (t) => {
+    t.is(toPlainText('Hello 🎉 World'), 'Hello World', 'removes emojis by default')
+    t.is(toPlainText('Hello 🎉 World', { skipEmoji: false }), 'Hello World', 'removes emojis when explicitly false')
+})
+
+test('Options - skipEmoji with fancy text', (t) => {
+    t.is(toPlainText('𝐇𝐞𝐥𝐥𝐨 🎉 𝐖𝐨𝐫𝐥𝐝', { skipEmoji: true }), 'Hello 🎉 World', 'converts fancy text but preserves emoji')
+    t.is(toPlainText('🎀ⓗⓔⓛⓛⓞ🎀', { skipEmoji: true }), '🎀hello🎀', 'preserves emojis with circled letters')
+})
+
+test('Options - skipEmoji combined with normalizeSpaces', (t) => {
+    t.is(toPlainText('Hello   🎉   World', { skipEmoji: true, normalizeSpaces: true }), 'Hello 🎉 World', 'both options work together')
+    t.is(toPlainText('Hello   🎉   World', { skipEmoji: true, normalizeSpaces: false }), 'Hello   🎉   World', 'skipEmoji with spaces preserved')
+})

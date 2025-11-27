@@ -63,13 +63,38 @@ const result = customTransform('𝐓𝐄𝐒𝐓')
 
 ## API
 
-### toPlainText(text)
+### toPlainText(text, options?)
 
 Converts fancy Unicode text to plain ASCII
 
-| Property | Type   | Description                       |
-| -------- | ------ | --------------------------------- |
-| `text`   | string | Input text with Unicode characters |
+| Property  | Type   | Description                        |
+| --------- | ------ | ---------------------------------- |
+| `text`    | string | Input text with Unicode characters |
+| `options` | object | Optional configuration object      |
+
+#### Options
+
+| Option           | Type    | Default | Description                                                                          |
+| ---------------- | ------- | ------- | ------------------------------------------------------------------------------------ |
+| `normalizeSpaces`| boolean | `true`  | Collapse multiple spaces and trim whitespace                                         |
+| `skipEmoji`      | boolean | `false` | Preserve emoji characters (still removes other decorations like box drawing, arrows) |
+
+#### Examples
+
+```js
+// Default behavior - emojis removed
+toPlainText('Hello 🎉 World') // => 'Hello World'
+
+// Preserve emojis
+toPlainText('Hello 🎉 World', { skipEmoji: true }) // => 'Hello 🎉 World'
+
+// Preserve spacing
+toPlainText('Hello   World', { normalizeSpaces: false }) // => 'Hello   World'
+
+// Combined options
+toPlainText('𝐇𝐞𝐥𝐥𝐨  🎉  𝐖𝐨𝐫𝐥𝐝', { skipEmoji: true, normalizeSpaces: false })
+// => 'Hello  🎉  World'
+```
 
 Returns a plain ASCII string with normalized whitespace and casing
 
