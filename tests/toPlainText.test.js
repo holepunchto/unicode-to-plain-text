@@ -218,3 +218,23 @@ test('Non-English - Empty strings between languages', (t) => {
 test('Non-English - RTL text preservation', (t) => {
     t.is(toPlainText('Hello مرحبا שלום World'), 'Hello مرحبا שלום World', 'RTL scripts preserved')
 })
+
+test('Options - ASCII-only fast path keeps spaces if disabled', (t) => {
+    t.is(toPlainText('Test     Test', { normalizeSpaces: false }), 'Test     Test', 'ASCII fast path preserves spacing when disabled')
+})
+
+test('Options - ASCII-only fast path collapses spaces if enabled', (t) => {
+    t.is(toPlainText('Test     Test'), 'Test Test', 'ASCII fast path collapses spaces when enabled')
+})
+
+test('Options - disable normalizeSpaces with fancy text', (t) => {
+    t.is(toPlainText('𝐇𝐞𝐥𝐥𝐨   𝐖𝐨𝐫𝐥𝐝 ', { normalizeSpaces: false }), 'Hello   World ', 'should map fancy chars but preserve extra spaces (squared letters)')
+    t.is(toPlainText('  ⓗⓔⓛⓛⓞ  ⓦⓞⓡⓛⓓ', { normalizeSpaces: false }), '  hello  world', 'should map fancy chars but preserve extra spaces (round bubble letters)')
+    t.is(toPlainText(' 𝔥𝔢𝔩𝔩𝔬   𝔴𝔬𝔯𝔩𝔡  ', { normalizeSpaces: false }), ' hello   world  ', 'should map fancy chars but preserve extra spaces (gotic letters)')
+})
+
+test('Options - enable normalizeSpaces with fancy text', (t) => {
+    t.is(toPlainText('𝐇𝐞𝐥𝐥𝐨     𝐖𝐨𝐫𝐥𝐝'), 'Hello World', 'should map fancy chars and normalize spaces (squared letters)')
+    t.is(toPlainText('ⓗⓔⓛⓛⓞ  ⓦⓞⓡⓛⓓ'), 'hello world', 'should map fancy chars but preserve extra spaces (round bubble letters)')
+    t.is(toPlainText(' 𝔥𝔢𝔩𝔩𝔬   𝔴𝔬𝔯𝔩𝔡 '), 'hello world', 'should map fancy chars but preserve extra spaces (gotic letters)')
+})
