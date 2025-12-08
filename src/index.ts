@@ -1,4 +1,4 @@
-import { handleUnicodeId } from './handleUnicodeId'
+import { handleUnicodeId, isUnicodeIdList } from './handleUnicodeId'
 import { mapCharacters } from './mapCharacters'
 import { normalizeCasing } from './normalizeCasing'
 import { normalizeUnicode } from './normalizeUnicode'
@@ -6,7 +6,6 @@ import { removeDecorations } from './removeDecorations'
 import { pipe } from './pipe'
 import { validateInput } from './utils/validation'
 import { normalizeSpaces } from './normalizeSpaces'
-import { isAsciiOnly } from './isAsciiOnly'
 import { handleFlipped } from './handleFlipped'
 
 export type ToPlainTextOptions = {
@@ -44,27 +43,24 @@ const DEFAULT_OPTIONS: ToPlainTextOptions = {
  */
 export const toPlainText = (text: string, options = DEFAULT_OPTIONS): string => {
   const validated = validateInput(text)
+  
+  if (isUnicodeIdList(validated)) return handleUnicodeId(validated)
 
-  const normalizeSpacesHandler =
-    (options?.normalizeSpaces ?? DEFAULT_OPTIONS.normalizeSpaces)
-      ? normalizeSpaces
-      : (text: string) => text
-
-  const removeDecorationsHandler = (text: string) =>
-    removeDecorations(text, { skipEmoji: options?.skipEmoji ?? DEFAULT_OPTIONS.skipEmoji })
-
-  if (isAsciiOnly(validated)) {
-    return pipe(handleUnicodeId, normalizeSpacesHandler)(validated)
-  }
-
-  return pipe(
+  let result = pipe(
     handleFlipped,
     mapCharacters,
     normalizeUnicode,
-    removeDecorationsHandler,
-    normalizeSpacesHandler,
-    normalizeCasing
   )(validated)
+
+  const fancyReplaced = result !== validated
+
+  result = removeDecorations(result, { skipEmoji: options?.skipEmoji ?? DEFAULT_OPTIONS.skipEmoji })
+  if (fancyReplaced) result = normalizeCasing(result)
+
+  const shouldNormalizeSpaces = options?.normalizeSpaces ?? DEFAULT_OPTIONS.normalizeSpaces
+  if (shouldNormalizeSpaces) result = normalizeSpaces(result)
+
+  return result
 }
 
 // Export individual transformation functions for advanced usage

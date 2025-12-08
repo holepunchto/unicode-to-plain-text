@@ -219,6 +219,11 @@ test('Non-English - RTL text preservation', (t) => {
     t.is(toPlainText('Hello مرحبا שלום World'), 'Hello مرحبا שלום World', 'RTL scripts preserved')
 })
 
+test('Keep case', (t) => {
+    t.is(toPlainText("texT", { skipEmoji: true }), "texT", 'upper case letter at the end of word')
+    t.is(toPlainText("texT ⚡️", { skipEmoji: true }), "texT ⚡️", 'upper case letter at the end of word with emoji')
+})
+
 test('Options - ASCII-only fast path keeps spaces if disabled', (t) => {
     t.is(toPlainText('Test     Test', { normalizeSpaces: false }), 'Test     Test', 'ASCII fast path preserves spacing when disabled')
 })
@@ -279,6 +284,14 @@ test('Options - skipEmoji combined with normalizeSpaces', (t) => {
     t.is(toPlainText('Hello   🎉   World', { skipEmoji: true, normalizeSpaces: true }), 'Hello 🎉 World', 'both options work together')
     t.is(toPlainText('Hello   🎉   World', { skipEmoji: true, normalizeSpaces: false }), 'Hello   🎉   World', 'skipEmoji with spaces preserved')
 })
+
+/*
+test('Options - skipEmoji upper case text', (t) => {
+    t.is(toPlainText("Text ⚡️", { skipEmoji: true }), "Text ⚡️", 'upper case letter at the start of word')
+    t.is(toPlainText("texT ⚡️", { skipEmoji: true }), "texT ⚡️", 'upper case letter at the end of word')
+    t.is(toPlainText("TEXT ⚡️", { skipEmoji: true }), "TEXT ⚡️", 'upper case letters')
+})
+*/
 
 test('Options - skipEmoji preserves all emoji categories', (t) => {
     // Smileys & Emotion (U+1F600 range)
