@@ -1,6 +1,6 @@
 {
   "name": "unicode-to-plain-text",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Convert fancy Unicode text to plain ASCII with smart language preservation",
   "keywords": [
     "unicode",
