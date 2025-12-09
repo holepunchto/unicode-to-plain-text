@@ -285,14 +285,6 @@ test('Options - skipEmoji combined with normalizeSpaces', (t) => {
     t.is(toPlainText('Hello   🎉   World', { skipEmoji: true, normalizeSpaces: false }), 'Hello   🎉   World', 'skipEmoji with spaces preserved')
 })
 
-/*
-test('Options - skipEmoji upper case text', (t) => {
-    t.is(toPlainText("Text ⚡️", { skipEmoji: true }), "Text ⚡️", 'upper case letter at the start of word')
-    t.is(toPlainText("texT ⚡️", { skipEmoji: true }), "texT ⚡️", 'upper case letter at the end of word')
-    t.is(toPlainText("TEXT ⚡️", { skipEmoji: true }), "TEXT ⚡️", 'upper case letters')
-})
-*/
-
 test('Options - skipEmoji preserves all emoji categories', (t) => {
     // Smileys & Emotion (U+1F600 range)
     t.is(toPlainText('😀😂🥰😎🤔', { skipEmoji: true }), '😀😂🥰😎🤔', 'preserves smileys')
