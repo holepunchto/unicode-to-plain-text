@@ -219,6 +219,11 @@ test('Non-English - RTL text preservation', (t) => {
     t.is(toPlainText('Hello مرحبا שלום World'), 'Hello مرحبا שלום World', 'RTL scripts preserved')
 })
 
+test('Keep case', (t) => {
+    t.is(toPlainText("texT", { skipEmoji: true }), "texT", 'upper case letter at the end of word')
+    t.is(toPlainText("texT ⚡️", { skipEmoji: true }), "texT ⚡️", 'upper case letter at the end of word with emoji')
+})
+
 test('Options - ASCII-only fast path keeps spaces if disabled', (t) => {
     t.is(toPlainText('Test     Test', { normalizeSpaces: false }), 'Test     Test', 'ASCII fast path preserves spacing when disabled')
 })
