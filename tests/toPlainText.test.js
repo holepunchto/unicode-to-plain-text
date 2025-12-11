@@ -20,7 +20,7 @@ test('Username Safety - Unicode Text Conversion', (t) => {
     t.is(toPlainText('Ｊａｚｑｕｅｌｙｎ Ｖｉｋｔｏｒ Ａｍｂｒｏｓｅ Ｆｅｌｄｗｉｎｘ'), ORIGINAL, 'Wide Fonts');
     t.is(toPlainText('𝙹𝚊𝚣𝚚𝚞𝚎𝚕𝚢𝚗 𝚅𝚒𝚔𝚝𝚘𝚛 𝙰𝚖𝚋𝚛𝚘𝚜𝚎 𝙵𝚎𝚕𝚍𝚠𝚒𝚗𝚡'), ORIGINAL, 'Monospace / Fixed-width');
     t.is(toPlainText('𝖩𝖺𝗓𝗊𝗎𝖾𝗅𝗒𝗇 𝖵𝗂𝗄𝗍𝗈𝗋 𝖠𝗆𝖻𝗋𝗈𝗌𝖾 𝖥𝖾𝗅𝖽𝗐𝗂𝗇𝗑'), ORIGINAL, 'Sans-serif / No Strokes');
-    t.is(toPlainText('Jäżqüëḷÿṅ Ṿïḳẗöṙ Äṁḅṙöṡë Ḟëḷḋẅïṅẍ'), ORIGINAL, 'Rock Dots');
+    t.is(toPlainText('Jäżqüëḷÿṅ Ṿïḳẗöṙ Äṁḅṙöṡë Ḟëḷḋẅïṅẍ'), "Jazqüelyn Viktör Ambröse Feldwinx", 'Rock Dots');
 
     // Enclosed characters - convert to uppercase
     t.is(toPlainText('🄹🄰🅉🅀🅄🄴🄻🅈🄽 🅅🄸🄺🅃🄾🅁 🄰🄼🄱🅁🄾🅂🄴 🄵🄴🄻🄳🅆🄸🄽🅇'), ORIGINAL_UPPER, 'Squared');
@@ -217,6 +217,10 @@ test('Non-English - Empty strings between languages', (t) => {
 
 test('Non-English - RTL text preservation', (t) => {
     t.is(toPlainText('Hello مرحبا שלום World'), 'Hello مرحبا שלום World', 'RTL scripts preserved')
+})
+
+test('Non-English - ıİöÖçÇşŞğĞüÜ preservation', (t) => {
+    t.is(toPlainText('ıİöÖçÇşŞğĞüÜ'), 'ıİöÖçÇşŞğĞüÜ', 'ıİöÖçÇşŞğĞüÜ is preserved')
 })
 
 test('Keep case', (t) => {
