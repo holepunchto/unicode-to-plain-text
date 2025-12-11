@@ -2,8 +2,6 @@
  * Miscellaneous
  */
 export const MISCELLANEOUS_MAP = {
-  Ş: 's',
-  ş: 's',
   Ș: 's',
   ș: 's',
   ē: 'e',
