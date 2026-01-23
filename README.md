@@ -28,12 +28,28 @@ toPlainText('ＨＥＬＬＯ') // => 'HELLO'
 Language preservation:
 
 ```js
-// Real languages are automatically preserved
-toPlainText('Hello Γεια σας')  // => 'Hello Γεια σας' (Greek preserved)
-toPlainText('Test Привет')     // => 'Test Привет' (Cyrillic preserved)
+// Preserve specific writing systems
+toPlainText('Привет 𝐖𝐨𝐫𝐥𝐝', { preserve: ['cyrillic'] }) // => 'Привет World'
+toPlainText('你好 𝐖𝐨𝐫𝐥𝐝', { preserve: ['cjk'] })       // => '你好 World'
 
-// But lookalike characters are converted
+// But lookalike characters are converted when not preserved
 toPlainText('Α test')  // => 'A test' (Greek Alpha → Latin A)
+```
+
+Sanitize user input:
+
+```js
+import { sanitize } from 'unicode-to-plain-text'
+
+// Clean and validate display names
+sanitize('𝐉𝐨𝐡𝐧 𝐃𝐨𝐞')
+// => { text: 'John Doe', valid: true, graphemeCount: 8 }
+
+sanitize('   ')
+// => { text: '', valid: false, graphemeCount: 0, error: 'whitespace_only' }
+
+sanitize('AB', { minGraphemes: 3 })
+// => { text: 'AB', valid: false, graphemeCount: 2, error: 'too_short' }
 ```
 
 Custom pipelines:
@@ -41,21 +57,19 @@ Custom pipelines:
 ```js
 import {
   pipe,
-  handleUpsideDown,
+  handleFlipped,
   mapCharacters,
   normalizeUnicode,
   removeDecorations,
-  normalizeWhitespace,
   normalizeCasing
 } from 'unicode-to-plain-text'
 
 // Create a custom pipeline
 const customTransform = pipe(
-  handleUpsideDown,
+  handleFlipped,
   mapCharacters,
   normalizeUnicode,
-  removeDecorations,
-  normalizeWhitespace
+  removeDecorations
 )
 
 const result = customTransform('𝐓𝐄𝐒𝐓')
@@ -74,10 +88,14 @@ Converts fancy Unicode text to plain ASCII
 
 #### Options
 
-| Option           | Type    | Default | Description                                                                          |
-| ---------------- | ------- | ------- | ------------------------------------------------------------------------------------ |
-| `normalizeSpaces`| boolean | `true`  | Collapse multiple spaces and trim whitespace                                         |
-| `skipEmoji`      | boolean | `false` | Preserve emoji characters (still removes other decorations like box drawing, arrows) |
+| Option            | Type           | Default | Description                                              |
+| ----------------- | -------------- | ------- | -------------------------------------------------------- |
+| `normalizeSpaces` | boolean        | `true`  | Collapse spaces, convert whitespace, strip invisible     |
+| `skipEmoji`       | boolean        | `false` | Preserve emoji characters                                |
+| `preserve`        | WritingSystem[]| -       | Writing systems to preserve (see below)                  |
+| `trim`            | TrimOption     | `'all'` | Trim mode: `'all'`, `'start'`, `'end'`, or `'none'`      |
+
+**WritingSystem**: `'greek'` | `'cyrillic'` | `'arabic'` | `'hebrew'` | `'cjk'` | `'ethiopic'` | `'thai'` | `'devanagari'`
 
 #### Examples
 
@@ -91,22 +109,55 @@ toPlainText('Hello 🎉 World', { skipEmoji: true }) // => 'Hello 🎉 World'
 // Preserve spacing
 toPlainText('Hello   World', { normalizeSpaces: false }) // => 'Hello   World'
 
-// Combined options
-toPlainText('𝐇𝐞𝐥𝐥𝐨  🎉  𝐖𝐨𝐫𝐥𝐝', { skipEmoji: true, normalizeSpaces: false })
-// => 'Hello  🎉  World'
+// Preserve writing systems
+toPlainText('שלום 𝐖𝐨𝐫𝐥𝐝', { preserve: ['hebrew'] }) // => 'שלום World'
+
+// Control trimming
+toPlainText('  hello  ', { trim: 'start' }) // => 'hello '
+toPlainText('  hello  ', { trim: 'none' })  // => ' hello '
 ```
 
-Returns a plain ASCII string with normalized whitespace and casing
+### sanitize(text, options?)
+
+Sanitizes and validates text for use as display names
+
+| Property  | Type   | Description                        |
+| --------- | ------ | ---------------------------------- |
+| `text`    | string | Input text to sanitize             |
+| `options` | object | Optional configuration object      |
+
+#### Options
+
+| Option        | Type           | Default | Description                         |
+| ------------- | -------------- | ------- | ----------------------------------- |
+| `minGraphemes`| number         | `1`     | Minimum grapheme count              |
+| `maxGraphemes`| number         | `64`    | Maximum grapheme count              |
+| `preserve`    | WritingSystem[]| -       | Writing systems to preserve         |
+| `skipEmoji`   | boolean        | `false` | Preserve emoji characters           |
+| `trim`        | TrimOption     | `'all'` | Trim mode                           |
+
+#### Returns
+
+```ts
+{
+  text: string        // Sanitized text
+  valid: boolean      // Whether validation passed
+  graphemeCount: number
+  error?: 'empty' | 'too_short' | 'too_long' | 'whitespace_only'
+}
+```
 
 ### Individual Functions
 
-- `handleUpsideDown(text)` - Reverses upside-down text
-- `mapCharacters(text)` - Maps Unicode to ASCII equivalents
+- `handleFlipped(text)` - Handles upside-down and mirrored text
+- `mapCharacters(text, options?)` - Maps Unicode to ASCII equivalents
 - `normalizeUnicode(text)` - Removes diacritics from Latin text
-- `removeDecorations(text)` - Removes emojis and decorations
-- `normalizeWhitespace(text)` - Normalizes and trims whitespace
+- `removeDecorations(text, options?)` - Removes emojis and decorations
+- `normalizeSpaces(text, options?)` - Normalizes whitespace with trim control
 - `normalizeCasing(text)` - Normalizes inconsistent casing
 - `pipe(...fns)` - Composes functions into a pipeline
+- `pipeWith(...fns)` - Pipe with shared context
+- `when(fn, condition)` - Conditional pipeline step
 
 ## License
 
