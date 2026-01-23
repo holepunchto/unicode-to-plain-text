@@ -67,3 +67,28 @@ export function pipe<A, B, C, D, E, F, G, H, I, J>(
 export function pipe(...fns: Array<PipeFn<any, any>>): PipeFn<any, any> {
   return (input: any): any => fns.reduce((acc, fn) => fn(acc), input)
 }
+
+/** Function with context for pipeWith */
+type PipeWithFn<T, U, C> = (input: T, context: C) => U
+
+/**
+ * Pipe with shared context passed to all functions.
+ * @example: pipeWith(fn1, fn2)(input, context)
+ */
+export function pipeWith<T, C>(
+  ...fns: Array<PipeWithFn<T, T, C>>
+): (input: T, context: C) => T {
+  return (input: T, context: C): T =>
+    fns.reduce((acc, fn) => fn(acc, context), input)
+}
+
+/**
+ * Conditional pipeline step - only runs fn if condition is true.
+ * @example: pipeWith(fn1, when(fn2, (val, ctx) => val !== ctx.original))(input, ctx)
+ */
+export const when = <T, C>(
+  fn: PipeWithFn<T, T, C>,
+  condition: (value: T, context: C) => boolean
+): PipeWithFn<T, T, C> =>
+  (input: T, context: C): T => condition(input, context) ? fn(input, context) : input
+
