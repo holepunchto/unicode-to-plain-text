@@ -141,7 +141,7 @@ test('Non-English - Other Scripts', (t) => {
     t.is(toPlainText('ሰላም ልዑል'), 'ሰላም ልዑል', 'Amharic (Ethiopian)')
     t.is(toPlainText('Сайн байна уу'), 'Сайн байна уу', 'Mongolian Cyrillic')
     t.is(toPlainText('ဟယ်လို ကမ္ဘာလောက'), 'ဟယ်လို ကမ္ဘာလောက', 'Burmese')
-    t.is(toPlainText('សួស្តី​ពិភពលោក'), 'សួស្តី​ពិភពលោក', 'Khmer (Cambodian)')
+    t.is(toPlainText('សួស្តី​ពិភពលោក'), 'សួស្តីពិភពលោក', 'Khmer (Cambodian) - zero-width space stripped')
 })
 
 test('Non-English - Mixed Language Content', (t) => {
