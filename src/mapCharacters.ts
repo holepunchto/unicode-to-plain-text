@@ -13,78 +13,56 @@ import { DARK_SQUARES_MAP } from './maps/DARK_SQUARES_MAP'
 import { REGIONAL_INDICATORS_MAP } from './maps/REGIONAL_INDICATORS_MAP'
 import { PARENTHESIZED_MAP } from './maps/PARENTHESIZED_MAP'
 import { MISCELLANEOUS_MAP } from './maps/MISCELLANEOUS_MAP'
-/**
- * Maps fancy Unicode characters to plain ASCII.
- * Preserves real Greek/Ethiopic when detected.
- * @example: mapCharacters('HELLO Math ABC') → 'HELLO Math ABC'
- */
-export const mapCharacters = (text: string): string => {
-  const preserve = getPreserveSet(text)
-  const map = getCharMap()
 
-  return Array.from(text)
-    .map((char) => (preserve.has(char) ? char : (map.get(char) ?? char)))
-    .join('')
+export type WritingSystem = 'greek' | 'cyrillic' | 'arabic' | 'hebrew' | 'cjk' | 'ethiopic' | 'thai' | 'devanagari'
+
+const WRITING_SYSTEM_RANGES: Record<WritingSystem, [number, number][]> = {
+  greek: [[0x0370, 0x03ff], [0x1f00, 0x1fff]],
+  cyrillic: [[0x0400, 0x04ff], [0x0500, 0x052f]],
+  arabic: [[0x0600, 0x06ff], [0x0750, 0x077f], [0x08a0, 0x08ff]],
+  hebrew: [[0x0590, 0x05ff]],
+  cjk: [[0x4e00, 0x9fff], [0x3400, 0x4dbf], [0x3040, 0x309f], [0x30a0, 0x30ff], [0xac00, 0xd7af]],
+  ethiopic: [[0x1200, 0x137f]],
+  thai: [[0x0e00, 0x0e7f]],
+  devanagari: [[0x0900, 0x097f]]
+}
+
+export type MapCharactersOptions = {
+  preserve?: WritingSystem[]
 }
 
 /**
- * Returns Set of chars to preserve (real Greek or Ethiopic).
+ * Maps fancy Unicode characters to plain ASCII.
+ * @example: mapCharacters('𝐇𝐞𝐥𝐥𝐨', { preserve: ['cyrillic'] }) → 'Hello'
  */
-const getPreserveSet = (text: string): Set<string> => {
+export const mapCharacters = (text: string, options?: MapCharactersOptions): string => {
+  const preserveSet = getPreserveSet(options?.preserve)
+  const map = getCharMap()
+
+  return Array.from(text)
+    .map((char) => (preserveSet.has(char) ? char : (map.get(char) ?? char)))
+    .join('')
+}
+
+const getPreserveSet = (systems?: WritingSystem[]): Set<string> => {
   const set = new Set<string>()
 
-  if (hasRealGreek(text)) {
-    addRange(set, 0x0370, 0x03ff) // Greek and Coptic
-    addRange(set, 0x1f00, 0x1fff) // Greek Extended
-  }
-
-  if (hasRealEthiopic(text)) {
-    addRange(set, 0x1200, 0x137f) // Ethiopic
+  if (systems) {
+    for (const system of systems) {
+      const ranges = WRITING_SYSTEM_RANGES[system]
+      if (ranges) {
+        for (const [start, end] of ranges) addRange(set, start, end)
+      }
+    }
   }
 
   return set
 }
 
-/**
- * Detects real Greek via final sigma or any Greek char.
- * @example: hasRealGreek('Γεια') → true
- */
-const hasRealGreek = (text: string): boolean =>
-  [...text].some((char) => {
-    const code = char.charCodeAt(0)
-    return (code >= 0x0370 && code <= 0x03ff) || (code >= 0x1f00 && code <= 0x1fff)
-  })
-
-/**
- * Detects real Ethiopic (Amharic) text by checking for long sequences or multiple words.
- * @example: hasRealEthiopic('ሰላም እንዴት ነህ') → true
- */
-const hasRealEthiopic = (text: string): boolean => {
-  let count = 0,
-    hasSpace = false,
-    inEthiopicWord = false
-  for (const char of text) {
-    const code = char.charCodeAt(0)
-    if (code >= 0x1200 && code <= 0x137f) {
-      if (++count > 5) return true
-      if (inEthiopicWord && char === ' ') hasSpace = true
-      inEthiopicWord = true
-    } else inEthiopicWord = false
-  }
-  return hasSpace && count > 1
-}
-
-/**
- * Adds a range of Unicode code points to a Set using String.fromCodePoint.
- * @example: addRange(set, 0x0370, 0x03FF) → adds all Greek and Coptic chars
- */
 const addRange = (set: Set<string>, start: number, end: number): void => {
   for (let i = start; i <= end; i++) set.add(String.fromCodePoint(i))
 }
 
-/**
- * Lazy char map.
- */
 let CHAR_MAP: Map<string, string> | null = null
 
 const buildCharMap = (): Map<string, string> => {
