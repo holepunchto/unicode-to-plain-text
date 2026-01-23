@@ -20,6 +20,7 @@ type Context = ToPlainTextOptions & { original: string }
 const DEFAULT_OPTIONS: ToPlainTextOptions = {
   normalizeSpaces: true,
   skipEmoji: false,
+  preserve: [],
   trim: 'all'
 }
 
