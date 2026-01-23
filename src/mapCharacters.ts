@@ -16,6 +16,8 @@ import { MISCELLANEOUS_MAP } from './maps/MISCELLANEOUS_MAP'
 
 export type WritingSystem = 'greek' | 'cyrillic' | 'arabic' | 'hebrew' | 'cjk' | 'ethiopic' | 'thai' | 'devanagari'
 
+export type PreserveOption = 'all' | WritingSystem[]
+
 const WRITING_SYSTEM_RANGES: Record<WritingSystem, [number, number][]> = {
   greek: [[0x0370, 0x03ff], [0x1f00, 0x1fff]],
   cyrillic: [[0x0400, 0x04ff], [0x0500, 0x052f]],
@@ -27,8 +29,10 @@ const WRITING_SYSTEM_RANGES: Record<WritingSystem, [number, number][]> = {
   devanagari: [[0x0900, 0x097f]]
 }
 
+const ALL_WRITING_SYSTEMS = Object.keys(WRITING_SYSTEM_RANGES) as WritingSystem[]
+
 export type MapCharactersOptions = {
-  preserve?: WritingSystem[]
+  preserve?: PreserveOption
 }
 
 /**
@@ -44,8 +48,10 @@ export const mapCharacters = (text: string, options?: MapCharactersOptions): str
     .join('')
 }
 
-const getPreserveSet = (systems?: WritingSystem[]): Set<string> => {
+const getPreserveSet = (preserve?: PreserveOption): Set<string> => {
   const set = new Set<string>()
+
+  const systems = preserve === 'all' ? ALL_WRITING_SYSTEMS : preserve
 
   if (systems) {
     for (const system of systems) {

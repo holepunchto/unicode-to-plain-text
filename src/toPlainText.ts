@@ -1,5 +1,5 @@
 import { handleUnicodeId, isUnicodeIdList } from './handleUnicodeId'
-import { mapCharacters, WritingSystem } from './mapCharacters'
+import { mapCharacters, PreserveOption } from './mapCharacters'
 import { normalizeCasing } from './normalizeCasing'
 import { normalizeUnicode } from './normalizeUnicode'
 import { removeDecorations } from './removeDecorations'
@@ -11,7 +11,7 @@ import { handleFlipped } from './handleFlipped'
 export type ToPlainTextOptions = {
   normalizeSpaces?: boolean
   skipEmoji?: boolean
-  preserve?: WritingSystem[]
+  preserve?: PreserveOption
   trim?: TrimOption
 }
 

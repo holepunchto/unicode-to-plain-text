@@ -92,8 +92,10 @@ Converts fancy Unicode text to plain ASCII
 | ----------------- | -------------- | ------- | -------------------------------------------------------- |
 | `normalizeSpaces` | boolean        | `true`  | Collapse spaces, convert whitespace, strip invisible     |
 | `skipEmoji`       | boolean        | `false` | Preserve emoji characters                                |
-| `preserve`        | WritingSystem[]| -       | Writing systems to preserve (see below)                  |
+| `preserve`        | PreserveOption | `[]`    | Writing systems to preserve: `'all'` or array            |
 | `trim`            | TrimOption     | `'all'` | Trim mode: `'all'`, `'start'`, `'end'`, or `'none'`      |
+
+**PreserveOption**: `'all'` | `WritingSystem[]`
 
 **WritingSystem**: `'greek'` | `'cyrillic'` | `'arabic'` | `'hebrew'` | `'cjk'` | `'ethiopic'` | `'thai'` | `'devanagari'`
 
@@ -109,8 +111,11 @@ toPlainText('Hello 🎉 World', { skipEmoji: true }) // => 'Hello 🎉 World'
 // Preserve spacing
 toPlainText('Hello   World', { normalizeSpaces: false }) // => 'Hello   World'
 
-// Preserve writing systems
+// Preserve specific writing systems
 toPlainText('שלום 𝐖𝐨𝐫𝐥𝐝', { preserve: ['hebrew'] }) // => 'שלום World'
+
+// Preserve all writing systems
+toPlainText('καλημέρί', { preserve: 'all' }) // => 'καλημέρί'
 
 // Control trimming
 toPlainText('  hello  ', { trim: 'start' }) // => 'hello '

@@ -1,13 +1,13 @@
 import { toPlainText } from './toPlainText'
 import { validateInput } from './utils/validation'
 import { countGraphemes } from './utils/graphemes'
-import type { WritingSystem } from './mapCharacters'
+import type { PreserveOption } from './mapCharacters'
 import type { TrimOption } from './normalizeSpaces'
 
 export type SanitizeOptions = {
   minGraphemes?: number
   maxGraphemes?: number
-  preserve?: WritingSystem[]
+  preserve?: PreserveOption
   skipEmoji?: boolean
   trim?: TrimOption
 }

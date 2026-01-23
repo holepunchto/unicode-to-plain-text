@@ -1,5 +1,5 @@
 // Export types
-export type { WritingSystem } from './mapCharacters'
+export type { WritingSystem, PreserveOption } from './mapCharacters'
 export type { ToPlainTextOptions } from './toPlainText'
 export type { SanitizeOptions, SanitizeResult, SanitizeError } from './sanitize'
 

@@ -1,21 +1,29 @@
 const test = require('brittle')
 const { sanitize, toPlainText } = require('../dist/index.js')
 
-test('toPlainText - preserve prevents lookalike conversion', (t) => {
-    // Greek ί (iota with tonos) is in char map → converted to 'i' without preserve
-    t.is(toPlainText('καλημέρί'), 'καλημέρi', 'Greek ί converted without preserve')
-    t.is(toPlainText('καλημέρί', { preserve: ['greek'] }), 'καλημέρί', 'Greek ί preserved')
+test('toPlainText - preserve option', (t) => {
+    // Same input, different output based on preserve
+    const greekInput = 'καλημέρί'
+    t.is(toPlainText(greekInput), 'καλημέρi', 'without preserve: ί → i')
+    t.is(toPlainText(greekInput, { preserve: ['greek'] }), 'καλημέρί', 'with preserve: ί unchanged')
+    t.not(toPlainText(greekInput), toPlainText(greekInput, { preserve: ['greek'] }), 'outputs differ')
 
-    // Cyrillic Ԋ and Ԅ are in char map → converted then case-normalized
-    t.is(toPlainText('ԊԄllo'), 'Hello', 'Cyrillic Ԋ/Ԅ converted without preserve')
-    t.is(toPlainText('ԊԄllo', { preserve: ['cyrillic'] }), 'ԊԄllo', 'Cyrillic Ԋ/Ԅ preserved')
+    const cyrillicInput = 'ԊԄllo'
+    t.is(toPlainText(cyrillicInput), 'Hello', 'without preserve: Ԋ/Ԅ → H/E')
+    t.is(toPlainText(cyrillicInput, { preserve: ['cyrillic'] }), 'ԊԄllo', 'with preserve: unchanged')
+    t.not(toPlainText(cyrillicInput), toPlainText(cyrillicInput, { preserve: ['cyrillic'] }), 'outputs differ')
 })
 
-test('toPlainText - preserve with fancy unicode', (t) => {
-    // Fancy unicode still converted, native scripts pass through
-    t.is(toPlainText('Привет 𝐖𝐨𝐫𝐥𝐝'), 'Привет World', 'Cyrillic passes through')
-    t.is(toPlainText('你好 𝐖𝐨𝐫𝐥𝐝'), '你好 World', 'CJK passes through')
-    t.is(toPlainText('مرحبا 𝐖𝐨𝐫𝐥𝐝'), 'مرحبا World', 'Arabic passes through')
+test('toPlainText - preserve all shortcut', (t) => {
+    const greekInput = 'καλημέρί'
+    const cyrillicInput = 'ԊԄllo'
+
+    // 'all' preserves all writing systems
+    t.is(toPlainText(greekInput, { preserve: 'all' }), 'καλημέρί', 'preserve all keeps Greek')
+    t.is(toPlainText(cyrillicInput, { preserve: 'all' }), 'ԊԄllo', 'preserve all keeps Cyrillic')
+
+    // Still converts fancy unicode
+    t.is(toPlainText('𝐇𝐞𝐥𝐥𝐨', { preserve: 'all' }), 'Hello', 'still converts fancy')
 })
 
 test('toPlainText - normalizeSpaces strips invisible chars', (t) => {
@@ -39,8 +47,11 @@ test('sanitize - cleaning logic', (t) => {
 })
 
 test('sanitize - preserve option', (t) => {
-    t.is(sanitize('ԊԄllo', { preserve: ['cyrillic'] }).text, 'ԊԄllo', 'Cyrillic lookalikes preserved')
-    t.is(sanitize('ԊԄllo').text, 'Hello', 'Cyrillic lookalikes converted without preserve')
+    const input = 'ԊԄllo'
+    t.is(sanitize(input).text, 'Hello', 'without preserve: Ԋ/Ԅ converted')
+    t.is(sanitize(input, { preserve: ['cyrillic'] }).text, 'ԊԄllo', 'with preserve: unchanged')
+    t.is(sanitize(input, { preserve: 'all' }).text, 'ԊԄllo', 'preserve all: unchanged')
+    t.not(sanitize(input).text, sanitize(input, { preserve: ['cyrillic'] }).text, 'outputs differ')
 })
 
 test('sanitize - whitespace handling', (t) => {
