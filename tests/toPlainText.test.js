@@ -329,3 +329,96 @@ test('Options - skipEmoji preserves all emoji categories', (t) => {
     // Flags (U+1F1E0 range)
     t.is(toPlainText('🏳️🏴🚩', { skipEmoji: true }), '🏳️🏴🚩', 'preserves flags')
 })
+
+// ============================================================================
+// ASCII-ONLY MODE
+// ============================================================================
+
+test('Options - asciiOnly strips non-ASCII after normalization', (t) => {
+    t.is(toPlainText('Café', { asciiOnly: true }), 'Cafe', 'strips diacritics via normalization then keeps ASCII')
+    t.is(toPlainText('naïve', { asciiOnly: true }), 'naive', 'handles combining diacritics')
+    t.is(toPlainText('résumé', { asciiOnly: true }), 'resume', 'handles accented vowels')
+})
+
+test('Options - asciiOnly removes non-ASCII scripts', (t) => {
+    // Non-ASCII at edges - spaces trimmed
+    t.is(toPlainText('Hello 你好', { asciiOnly: true }), 'Hello', 'removes Chinese and trims')
+    t.is(toPlainText('World Привет', { asciiOnly: true }), 'World', 'removes Cyrillic and trims')
+    t.is(toPlainText('你好 World', { asciiOnly: true }), 'World', 'removes Chinese from start and trims')
+    t.is(toPlainText('Привет World', { asciiOnly: true }), 'World', 'removes Cyrillic from start and trims')
+
+    // Non-ASCII surrounded by spaces - spaces collapsed
+    t.is(toPlainText(' 你好  Hello  世界 ', { asciiOnly: true }), 'Hello', 'surrounded by non-ASCII, collapses and trims')
+    t.is(toPlainText('Hello  你好  World', { asciiOnly: true }), 'Hello World', 'non-ASCII in middle, spaces collapsed')
+    t.is(toPlainText('A 你 B 好 C', { asciiOnly: true }), 'A B C', 'multiple non-ASCII between ASCII')
+
+    // Multiple spaces around non-ASCII
+    t.is(toPlainText('Test   你好   End', { asciiOnly: true }), 'Test End', 'multiple spaces around non-ASCII collapsed')
+})
+
+test('Options - asciiOnly respects trim option', (t) => {
+    // Basic edge cases
+    t.is(toPlainText('Hello 你好', { asciiOnly: true, trim: 'none' }), 'Hello ', 'preserves trailing space')
+    t.is(toPlainText('你好 World', { asciiOnly: true, trim: 'none' }), ' World', 'preserves leading space')
+    t.is(toPlainText('你好 World', { asciiOnly: true, trim: 'start' }), 'World', 'trims start only')
+    t.is(toPlainText('Hello 你好', { asciiOnly: true, trim: 'end' }), 'Hello', 'trims end only')
+
+    // trim:start - trims leading, keeps trailing
+    t.is(toPlainText(' 你好  Hello  世界 ', { asciiOnly: true, trim: 'start' }), 'Hello ', 'trim:start removes leading, keeps trailing')
+    t.is(toPlainText('你好 A 世界 B 你好', { asciiOnly: true, trim: 'start' }), 'A B ', 'trim:start with multiple non-ASCII')
+
+    // trim:end - keeps leading, trims trailing
+    t.is(toPlainText(' 你好  Hello  世界 ', { asciiOnly: true, trim: 'end' }), ' Hello', 'trim:end keeps leading, removes trailing')
+    t.is(toPlainText('你好 A 世界 B 你好', { asciiOnly: true, trim: 'end' }), ' A B', 'trim:end with multiple non-ASCII')
+
+    // trim:none - keeps both
+    t.is(toPlainText(' 你好  Hello  世界 ', { asciiOnly: true, trim: 'none' }), ' Hello ', 'trim:none keeps edges, still collapses')
+    t.is(toPlainText('A  你好  B', { asciiOnly: true, trim: 'none' }), 'A B', 'trim:none, collapsed')
+
+    // To preserve all spaces: need normalizeSpaces:false AND trim:none
+    t.is(toPlainText(' 你好  Hello  世界 ', { asciiOnly: true, normalizeSpaces: false, trim: 'none' }), '   Hello   ', 'no collapse, no trim')
+    t.is(toPlainText('A  你好  B', { asciiOnly: true, normalizeSpaces: false, trim: 'none' }), 'A    B', 'no collapse preserves gaps')
+})
+
+test('Options - asciiOnly trim:start/end without normalizeSpaces', (t) => {
+    // Input: ' 你好  Hello  世界 ' → after strip: '    Hello   '
+    // trim:start without collapse
+    t.is(toPlainText(' 你好  Hello  世界 ', { asciiOnly: true, normalizeSpaces: false, trim: 'start' }), 'Hello   ', 'trim:start no collapse')
+
+    // Input: '你好  A  世界' → after strip: '  A  '
+    t.is(toPlainText('你好  A  世界', { asciiOnly: true, normalizeSpaces: false, trim: 'start' }), 'A  ', 'trim:start keeps trailing')
+
+    // trim:end without collapse
+    t.is(toPlainText(' 你好  Hello  世界 ', { asciiOnly: true, normalizeSpaces: false, trim: 'end' }), '   Hello', 'trim:end no collapse')
+    t.is(toPlainText('你好  A  世界', { asciiOnly: true, normalizeSpaces: false, trim: 'end' }), '  A', 'trim:end keeps leading')
+})
+
+test('Options - asciiOnly without normalizeSpaces', (t) => {
+    // Without normalizeSpaces, spaces are not collapsed but still trimmed
+    t.is(toPlainText('Hello  你好  World', { asciiOnly: true, normalizeSpaces: false }), 'Hello    World', 'no collapse, gaps remain')
+    t.is(toPlainText(' 你好  Hello  世界 ', { asciiOnly: true, normalizeSpaces: false }), 'Hello', 'no collapse, but trims')
+    t.is(toPlainText(' 你好  Hello  世界 ', { asciiOnly: true, normalizeSpaces: false, trim: 'none' }), '   Hello   ', 'no collapse, no trim')
+})
+
+test('Options - asciiOnly with fancy text', (t) => {
+    t.is(toPlainText('𝐇𝐞𝐥𝐥𝐨', { asciiOnly: true }), 'Hello', 'converts math bold')
+    t.is(toPlainText('𝕳𝖊𝖑𝖑𝖔', { asciiOnly: true }), 'Hello', 'converts fraktur')
+    t.is(toPlainText('Ｈｅｌｌｏ', { asciiOnly: true }), 'Hello', 'converts fullwidth')
+})
+
+test('Options - asciiOnly with emojis', (t) => {
+    t.is(toPlainText('Hello 🎉 World', { asciiOnly: true }), 'Hello World', 'removes emojis')
+    t.is(toPlainText('Test ✨', { asciiOnly: true }), 'Test', 'removes sparkles')
+})
+
+test('Options - asciiOnly combined with other options', (t) => {
+    t.is(toPlainText('  Hello  World  ', { asciiOnly: true, normalizeSpaces: true }), 'Hello World', 'collapses and trims')
+    t.is(toPlainText('  Hello  World  ', { asciiOnly: true, normalizeSpaces: false }), 'Hello  World', 'no collapse but still trims')
+    t.is(toPlainText('  Hello  World  ', { asciiOnly: true, normalizeSpaces: false, trim: 'none' }), '  Hello  World  ', 'no collapse, no trim')
+})
+
+test('Options - asciiOnly default is false', (t) => {
+    t.is(toPlainText('Café'), 'Cafe', 'diacritics normalized by default')
+    t.is(toPlainText('Hello 你好'), 'Hello 你好', 'non-Latin preserved by default')
+})
+
