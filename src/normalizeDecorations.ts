@@ -6,17 +6,17 @@ import { OTHER_DECORATIONS, isEmoji } from './maps/DECORATIVE_CHARS'
  */
 const SPAM_RATIO_THRESHOLD = 0.4
 
-export type RemoveDecorationsOptions = {
+export type NormalizeDecorationsOptions = {
   skipEmoji?: boolean
 }
 
 /**
  * Removes decorative characters.
  * Returns empty string if >70% of input was decoration (likely spam).
- * @example removeDecorations("Hello ✨ world ★") → "Hello  world "
- * @example removeDecorations("Hello 🎉 world", { skipEmoji: true }) → "Hello 🎉 world"
+ * @example normalizeDecorations("Hello ✨ world ★") → "Hello  world "
+ * @example normalizeDecorations("Hello 🎉 world", { skipEmoji: true }) → "Hello 🎉 world"
  */
-export const removeDecorations = (text: string, options?: RemoveDecorationsOptions): string => {
+export const normalizeDecorations = (text: string, options?: NormalizeDecorationsOptions): string => {
   const cleaned = [...text]
     .filter((char) => {
       // Always remove non-emoji decorations

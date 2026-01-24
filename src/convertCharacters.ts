@@ -31,15 +31,15 @@ const WRITING_SYSTEM_RANGES: Record<WritingSystem, [number, number][]> = {
 
 const ALL_WRITING_SYSTEMS = Object.keys(WRITING_SYSTEM_RANGES) as WritingSystem[]
 
-export type MapCharactersOptions = {
+export type ConvertCharactersOptions = {
   preserve?: PreserveOption
 }
 
 /**
  * Maps fancy Unicode characters to plain ASCII.
- * @example: mapCharacters('𝐇𝐞𝐥𝐥𝐨', { preserve: ['cyrillic'] }) → 'Hello'
+ * @example: convertCharacters('𝐇𝐞𝐥𝐥𝐨', { preserve: ['cyrillic'] }) → 'Hello'
  */
-export const mapCharacters = (text: string, options?: MapCharactersOptions): string => {
+export const convertCharacters = (text: string, options?: ConvertCharactersOptions): string => {
   const preserveSet = getPreserveSet(options?.preserve)
   const map = getCharMap()
 

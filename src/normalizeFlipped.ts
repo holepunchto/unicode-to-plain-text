@@ -5,9 +5,9 @@ import { MIRRORED_MAP, MIRRORED_LETTER_SWAPS } from './maps/MIRRORED_MAP'
 /**
  * Handles upside-down and mirrored (flipped) text.
  * Removes emoticons, detects type, normalizes.
- * @example: handleFlipped('xᴎiwblɘꟻ ɘꙅoᴙdmA') → 'Jazquelyn Ambrose'
+ * @example: normalizeFlipped('xᴎiwblɘꟻ ɘꙅoᴙdmA') → 'Jazquelyn Ambrose'
  */
-export const handleFlipped = (text: string): string => {
+export const normalizeFlipped = (text: string): string => {
   let result = removeEmoticons(text)
 
   if (isUpsideDown(result)) {
