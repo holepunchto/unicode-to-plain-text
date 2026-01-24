@@ -29,14 +29,14 @@ const DEFAULT_OPTIONS: ToPlainTextOptions = {
  * @example: toPlainText('𝐇𝐞𝐥𝐥𝐨') → 'Hello'
  * @example: toPlainText('Привет 𝐖𝐨𝐫𝐥𝐝', { preserve: ['cyrillic'] }) → 'Привет World'
  */
-export const toPlainText = (text: string, options = DEFAULT_OPTIONS): string => {
+export const toPlainText = (text: string, options?: ToPlainTextOptions): string => {
   const validated = validateInput(text)
 
   if (isCodePointList(validated)) return decodeUnicodeId(validated)
 
-  const merged = { ...DEFAULT_OPTIONS, ...options }
   const context: Context = {
-    ...merged,
+    ...DEFAULT_OPTIONS,
+    ...(options || {}),
     original: validated
   }
 
