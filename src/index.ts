@@ -1,6 +1,7 @@
 // Export types
 export type { WritingSystem, PreserveOption } from './convertCharacters'
 export type { ToPlainTextOptions } from './toPlainText'
+export type { WritingSystemAnalysis } from './detectWritingSystems'
 
 // Export main functions
 export { toPlainText } from './toPlainText'
@@ -13,3 +14,6 @@ export { normalizeDiacritics } from './normalizeDiacritics'
 export { normalizeDecorations } from './normalizeDecorations'
 export { normalizeCasing } from './normalizeCasing'
 export { pipe, pipeWith, when } from './pipe'
+
+// Export detection utilities
+export { detectWritingSystems, getWritingSystem } from './detectWritingSystems'
