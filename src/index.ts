@@ -2,6 +2,7 @@
 export type { WritingSystem, PreserveOption } from './convertCharacters'
 export type { ToPlainTextOptions } from './toPlainText'
 export type { WritingSystemAnalysis } from './detectWritingSystems'
+export type { HomoglyphMatch, HomoglyphAnalysis } from './detectHomoglyphs'
 
 // Export main functions
 export { toPlainText } from './toPlainText'
@@ -17,3 +18,4 @@ export { pipe, pipeWith, when } from './pipe'
 
 // Export detection utilities
 export { detectWritingSystems, getWritingSystem } from './detectWritingSystems'
+export { hasHomoglyphs, analyzeHomoglyphs, isSuspiciousMix } from './detectHomoglyphs'
