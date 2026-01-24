@@ -1,7 +1,7 @@
 const test = require('brittle')
 const { isAsciiOnly } = require('../dist/isAsciiOnly.js')
 const { normalizeCasing } = require('../dist/normalizeCasing.js')
-const { removeDecorations } = require('../dist/removeDecorations.js')
+const { normalizeDecorations } = require('../dist/normalizeDecorations.js')
 
 test('isAsciiOnly - boundaries', (t) => {
   t.is(isAsciiOnly('\x7f'), true, 'char 127 (DEL)')
@@ -48,18 +48,18 @@ test('normalizeCasing - edge cases', (t) => {
   t.is(normalizeCasing('123 456'), '123 456', 'no letters')
 })
 
-test('removeDecorations - spam ratio', (t) => {
-  t.is(removeDecorations('✨test✨'), 'test', '40% boundary')
-  t.is(removeDecorations('✨✨✨a✨✨✨'), '', 'high decoration')
+test('normalizeDecorations - spam ratio', (t) => {
+  t.is(normalizeDecorations('✨test✨'), 'test', '40% boundary')
+  t.is(normalizeDecorations('✨✨✨a✨✨✨'), '', 'high decoration')
 })
 
-test('removeDecorations - edge cases', (t) => {
-  t.is(removeDecorations('✨🌟💫'), '', 'only decorations')
-  t.is(removeDecorations('test'), 'test', 'no decorations')
-  t.is(removeDecorations(''), '', 'empty string')
+test('normalizeDecorations - edge cases', (t) => {
+  t.is(normalizeDecorations('✨🌟💫'), '', 'only decorations')
+  t.is(normalizeDecorations('test'), 'test', 'no decorations')
+  t.is(normalizeDecorations(''), '', 'empty string')
 })
 
-test('removeDecorations - mixed', (t) => {
-  t.is(removeDecorations('test 🎀 text'), 'test  text', 'emoji removal')
-  t.is(removeDecorations('✨t✨e✨s✨t✨'), 'test', 'interspersed')
+test('normalizeDecorations - mixed', (t) => {
+  t.is(normalizeDecorations('test 🎀 text'), 'test  text', 'emoji removal')
+  t.is(normalizeDecorations('✨t✨e✨s✨t✨'), 'test', 'interspersed')
 })

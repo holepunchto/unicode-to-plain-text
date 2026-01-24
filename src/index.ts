@@ -1,5 +1,5 @@
 // Export types
-export type { WritingSystem, PreserveOption } from './mapCharacters'
+export type { WritingSystem, PreserveOption } from './convertCharacters'
 export type { ToPlainTextOptions } from './toPlainText'
 export type { SanitizeOptions, SanitizeResult, SanitizeError } from './sanitize'
 
@@ -8,10 +8,10 @@ export { toPlainText } from './toPlainText'
 export { sanitize } from './sanitize'
 
 // Export individual transformation functions
-export { handleUnicodeId } from './handleUnicodeId'
-export { handleFlipped } from './handleFlipped'
-export { mapCharacters } from './mapCharacters'
-export { normalizeUnicode } from './normalizeUnicode'
-export { removeDecorations } from './removeDecorations'
+export { decodeUnicodeId } from './decodeUnicodeId'
+export { normalizeFlipped } from './normalizeFlipped'
+export { convertCharacters } from './convertCharacters'
+export { normalizeDiacritics } from './normalizeDiacritics'
+export { normalizeDecorations } from './normalizeDecorations'
 export { normalizeCasing } from './normalizeCasing'
 export { pipe, pipeWith, when } from './pipe'

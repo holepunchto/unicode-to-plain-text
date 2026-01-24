@@ -1,12 +1,12 @@
-import { handleUnicodeId, isUnicodeIdList } from './handleUnicodeId'
-import { mapCharacters, PreserveOption } from './mapCharacters'
+import { decodeUnicodeId, isCodePointList } from './decodeUnicodeId'
+import { convertCharacters, PreserveOption } from './convertCharacters'
 import { normalizeCasing } from './normalizeCasing'
-import { normalizeUnicode } from './normalizeUnicode'
-import { removeDecorations } from './removeDecorations'
+import { normalizeDiacritics } from './normalizeDiacritics'
+import { normalizeDecorations } from './normalizeDecorations'
 import { pipeWith, when } from './pipe'
 import { validateInput } from './utils/validation'
 import { normalizeSpaces, TrimOption } from './normalizeSpaces'
-import { handleFlipped } from './handleFlipped'
+import { normalizeFlipped } from './normalizeFlipped'
 
 export type ToPlainTextOptions = {
   normalizeSpaces?: boolean
@@ -32,15 +32,19 @@ const DEFAULT_OPTIONS: ToPlainTextOptions = {
 export const toPlainText = (text: string, options = DEFAULT_OPTIONS): string => {
   const validated = validateInput(text)
 
-  if (isUnicodeIdList(validated)) return handleUnicodeId(validated)
+  if (isCodePointList(validated)) return decodeUnicodeId(validated)
 
-  const context: Context = { ...DEFAULT_OPTIONS, ...options, original: validated }
+  const merged = { ...DEFAULT_OPTIONS, ...options }
+  const context: Context = {
+    ...merged,
+    original: validated
+  }
 
   return pipeWith<string, Context>(
-    handleFlipped,
-    mapCharacters,
-    normalizeUnicode,
-    removeDecorations,
+    normalizeFlipped,
+    convertCharacters,
+    normalizeDiacritics,
+    normalizeDecorations,
     when(normalizeCasing, (value, { original }) => value !== original),
     when(normalizeSpaces, (_, { normalizeSpaces }) => !!normalizeSpaces)
   )(validated, context)

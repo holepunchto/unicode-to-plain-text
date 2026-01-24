@@ -90,11 +90,14 @@ test('Non-English - East Asian with fancy text', (t) => {
 })
 
 test('Non-English - Cyrillic Scripts', (t) => {
+    // Cyrillic diacritics are stripped by default (й → и)
     t.is(toPlainText('Привіт світ'), 'Привіт світ', 'Ukrainian')
     t.is(toPlainText('Привет мир'), 'Привет мир', 'Russian')
-    t.is(toPlainText('Здравей свят'), 'Здравей свят', 'Bulgarian')
+    t.is(toPlainText('Здравей свят'), 'Здравеи свят', 'Bulgarian (й → и)')
     t.is(toPlainText('Здраво свете'), 'Здраво свете', 'Serbian Cyrillic')
     t.is(toPlainText('Тест'), 'Тест', 'Cyrillic word test')
+    // Use preserve to keep diacritics
+    t.is(toPlainText('Здравей свят', { preserve: ['cyrillic'] }), 'Здравей свят', 'Bulgarian preserved')
 })
 
 test('Non-English - Cyrillic with fancy English', (t) => {
@@ -136,12 +139,15 @@ test('Non-English - South Asian with fancy English', (t) => {
 })
 
 test('Non-English - Other Scripts', (t) => {
-    t.is(toPlainText('Γεια σου κόσμε'), 'Γεια σου κόσμε', 'Modern Greek (not lookalikes)')
-    t.is(toPlainText('Δοκιμή'), 'Δοκιμή', 'Greek test (real Greek, not fancy)')
+    // Greek and Cyrillic diacritics are stripped by default
+    t.is(toPlainText('Γεια σου κόσμε'), 'Γεια σου κοσμε', 'Modern Greek (tonos stripped)')
+    t.is(toPlainText('Δοκιμή'), 'Δοκιμη', 'Greek test (tonos stripped)')
     t.is(toPlainText('ሰላም ልዑል'), 'ሰላም ልዑል', 'Amharic (Ethiopian)')
-    t.is(toPlainText('Сайн байна уу'), 'Сайн байна уу', 'Mongolian Cyrillic')
+    t.is(toPlainText('Сайн байна уу'), 'Саин баина уу', 'Mongolian Cyrillic (й → и)')
     t.is(toPlainText('ဟယ်လို ကမ္ဘာလောက'), 'ဟယ်လို ကမ္ဘာလောက', 'Burmese')
     t.is(toPlainText('សួស្តី​ពិភពលោក'), 'សួស្តីពិភពលោក', 'Khmer (Cambodian) - zero-width space stripped')
+    // Use preserve to keep diacritics
+    t.is(toPlainText('Γεια σου κόσμε', { preserve: ['greek'] }), 'Γεια σου κόσμε', 'Greek preserved')
 })
 
 test('Non-English - Mixed Language Content', (t) => {
@@ -212,7 +218,8 @@ test('Non-English - Punctuation in different scripts', (t) => {
 })
 
 test('Non-English - Empty strings between languages', (t) => {
-    t.is(toPlainText('English     中文     Русский'), 'English 中文 Русский')
+    // Cyrillic й → и by default
+    t.is(toPlainText('English     中文     Русский'), 'English 中文 Русскии')
 })
 
 test('Non-English - RTL text preservation', (t) => {

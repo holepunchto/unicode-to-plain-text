@@ -1,62 +1,93 @@
 import { toPlainText } from './toPlainText'
 import { validateInput } from './utils/validation'
-import { countGraphemes } from './utils/graphemes'
-import type { PreserveOption } from './mapCharacters'
+import { detectWritingSystems } from './detectWritingSystems'
+import { hasHomoglyphs } from './detectHomoglyphs'
+import type { PreserveOption, WritingSystem } from './convertCharacters'
 import type { TrimOption } from './normalizeSpaces'
 
 export type SanitizeOptions = {
-  minGraphemes?: number
-  maxGraphemes?: number
+  minLength?: number
+  maxLength?: number
   preserve?: PreserveOption
   skipEmoji?: boolean
   trim?: TrimOption
+  truncate?: boolean
+  allowedWritingSystems?: WritingSystem[]
+  rejectHomoglyphs?: boolean
+  asciiOnly?: boolean
 }
 
-export type SanitizeError = 'empty' | 'too_short' | 'too_long' | 'whitespace_only'
+export type SanitizeError =
+  | 'empty'
+  | 'too_short'
+  | 'too_long'
+  | 'whitespace_only'
+  | 'homoglyphs'
+  | 'disallowed_writing_system'
 
 export type SanitizeResult = {
   text: string
   valid: boolean
-  graphemeCount: number
+  length: number
   error?: SanitizeError
 }
 
-const DEFAULT_MIN_GRAPHEMES = 1
-const DEFAULT_MAX_GRAPHEMES = 64
+const DEFAULT_MIN_LENGTH = 1
+const DEFAULT_MAX_LENGTH = 64
 
 /**
  * Sanitizes text using toPlainText, then validates.
- * @example: sanitize('𝐉𝐨𝐡𝐧  ') → { text: 'John', valid: true, graphemeCount: 4 }
+ * @example: sanitize('𝐉𝐨𝐡𝐧  ') → { text: 'John', valid: true, length: 4 }
+ * @example: sanitize('pаypal', { rejectHomoglyphs: true }) → { ..., valid: false, error: 'homoglyphs' }
  */
 export const sanitize = (text: string, options?: SanitizeOptions): SanitizeResult => {
   const input = validateInput(text)
-  const minGraphemes = options?.minGraphemes ?? DEFAULT_MIN_GRAPHEMES
-  const maxGraphemes = options?.maxGraphemes ?? DEFAULT_MAX_GRAPHEMES
+  const minLength = options?.minLength ?? DEFAULT_MIN_LENGTH
+  const maxLength = options?.maxLength ?? DEFAULT_MAX_LENGTH
 
-  const result = toPlainText(input, {
+  // Check for homoglyphs before any transformation
+  if (options?.rejectHomoglyphs && hasHomoglyphs(input)) {
+    return { text: input, valid: false, length: input.length, error: 'homoglyphs' }
+  }
+
+  let result = toPlainText(input, {
     normalizeSpaces: true,
     skipEmoji: options?.skipEmoji,
     preserve: options?.preserve,
-    trim: options?.trim
+    trim: options?.trim,
+    asciiOnly: options?.asciiOnly
   })
 
-  const graphemeCount = countGraphemes(result)
+  // Check allowed writing systems if specified
+  if (options?.allowedWritingSystems && options.allowedWritingSystems.length > 0) {
+    const { writingSystems } = detectWritingSystems(result)
+    const disallowed = writingSystems.filter((s) => !options.allowedWritingSystems!.includes(s))
+    if (disallowed.length > 0) {
+      return { text: result, valid: false, length: result.length, error: 'disallowed_writing_system' }
+    }
+  }
 
   if (input.length === 0) {
-    return { text: '', valid: false, graphemeCount: 0, error: 'empty' }
+    return { text: '', valid: false, length: 0, error: 'empty' }
   }
 
-  if (graphemeCount === 0) {
-    return { text: '', valid: false, graphemeCount: 0, error: 'whitespace_only' }
+  if (result.length === 0) {
+    return { text: '', valid: false, length: 0, error: 'whitespace_only' }
   }
 
-  if (graphemeCount < minGraphemes) {
-    return { text: result, valid: false, graphemeCount, error: 'too_short' }
+  if (result.length < minLength) {
+    return { text: result, valid: false, length: result.length, error: 'too_short' }
   }
 
-  if (graphemeCount > maxGraphemes) {
-    return { text: result, valid: false, graphemeCount, error: 'too_long' }
+  // Truncate if enabled, otherwise error on too_long
+  if (result.length > maxLength) {
+    if (options?.truncate) {
+      result = result.slice(0, maxLength)
+    } else {
+      return { text: result, valid: false, length: result.length, error: 'too_long' }
+    }
   }
 
-  return { text: result, valid: true, graphemeCount }
+  return { text: result, valid: true, length: result.length }
 }
+

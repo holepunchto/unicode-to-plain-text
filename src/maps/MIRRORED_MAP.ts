@@ -1,7 +1,7 @@
 /**
  * Mirrored/Flipped character mappings.
  * These characters appear horizontally flipped and need normalization.
- * Used for detection and normalization by mapCharacters.
+ * Used for detection and normalization by convertCharacters.
  */
 export const MIRRORED_MAP = {
   // Lowercase mirrored

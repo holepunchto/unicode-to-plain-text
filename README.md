@@ -43,13 +43,13 @@ import { sanitize } from 'unicode-to-plain-text'
 
 // Clean and validate display names
 sanitize('𝐉𝐨𝐡𝐧 𝐃𝐨𝐞')
-// => { text: 'John Doe', valid: true, graphemeCount: 8 }
+// => { text: 'John Doe', valid: true, length: 8 }
 
 sanitize('   ')
-// => { text: '', valid: false, graphemeCount: 0, error: 'whitespace_only' }
+// => { text: '', valid: false, length: 0, error: 'whitespace_only' }
 
-sanitize('AB', { minGraphemes: 3 })
-// => { text: 'AB', valid: false, graphemeCount: 2, error: 'too_short' }
+sanitize('AB', { minLength: 3 })
+// => { text: 'AB', valid: false, length: 2, error: 'too_short' }
 ```
 
 Custom pipelines:
@@ -57,19 +57,19 @@ Custom pipelines:
 ```js
 import {
   pipe,
-  handleFlipped,
-  mapCharacters,
+  normalizeFlipped,
+  convertCharacters,
   normalizeUnicode,
-  removeDecorations,
+  normalizeDecorations,
   normalizeCasing
 } from 'unicode-to-plain-text'
 
 // Create a custom pipeline
 const customTransform = pipe(
-  handleFlipped,
-  mapCharacters,
+  normalizeFlipped,
+  convertCharacters,
   normalizeUnicode,
-  removeDecorations
+  normalizeDecorations
 )
 
 const result = customTransform('𝐓𝐄𝐒𝐓')
@@ -97,7 +97,9 @@ Converts fancy Unicode text to plain ASCII
 
 **PreserveOption**: `'all'` | `WritingSystem[]`
 
-**WritingSystem**: `'greek'` | `'cyrillic'` | `'arabic'` | `'hebrew'` | `'cjk'` | `'ethiopic'` | `'thai'` | `'devanagari'`
+**WritingSystem**: `'latin'` | `'greek'` | `'cyrillic'` | `'arabic'` | `'hebrew'` | `'cjk'` | `'ethiopic'` | `'thai'` | `'devanagari'`
+
+> **Note**: `'latin'` preserves all European language diacritics (French, German, Spanish, Portuguese, Polish, Czech, Hungarian, Romanian, Turkish, Nordic, etc.)
 
 #### Examples
 
@@ -117,6 +119,10 @@ toPlainText('שלום 𝐖𝐨𝐫𝐥𝐝', { preserve: ['hebrew'] }) // => 'ש
 // Preserve all writing systems
 toPlainText('καλημέρί', { preserve: 'all' }) // => 'καλημέρί'
 
+// Preserve European diacritics (French, German, Turkish, Polish, etc.)
+toPlainText('Ömer Şahin', { preserve: ['latin'] }) // => 'Ömer Şahin'
+toPlainText('François Müller', { preserve: ['latin'] }) // => 'François Müller'
+
 // Control trimming
 toPlainText('  hello  ', { trim: 'start' }) // => 'hello '
 toPlainText('  hello  ', { trim: 'none' })  // => ' hello '
@@ -133,13 +139,17 @@ Sanitizes and validates text for use as display names
 
 #### Options
 
-| Option        | Type           | Default | Description                         |
-| ------------- | -------------- | ------- | ----------------------------------- |
-| `minGraphemes`| number         | `1`     | Minimum grapheme count              |
-| `maxGraphemes`| number         | `64`    | Maximum grapheme count              |
-| `preserve`    | WritingSystem[]| -       | Writing systems to preserve         |
-| `skipEmoji`   | boolean        | `false` | Preserve emoji characters           |
-| `trim`        | TrimOption     | `'all'` | Trim mode                           |
+| Option            | Type             | Default | Description                                    |
+| ----------------- | ---------------- | ------- | ---------------------------------------------- |
+| `minLength`       | number           | `1`     | Minimum length count                           |
+| `maxLength`       | number           | `64`    | Maximum length count                           |
+| `preserve`        | WritingSystem[]  | -       | Writing systems to preserve                    |
+| `skipEmoji`       | boolean          | `false` | Preserve emoji characters                      |
+| `trim`            | TrimOption       | `'all'` | Trim mode                                      |
+| `truncate`        | boolean          | `false` | Auto-truncate to maxLength instead of error |
+| `allowedWritingSystems`  | WritingSystem[]  | -       | Strict whitelist of allowed writing systems            |
+| `rejectHomoglyphs`| boolean          | `false` | Fail validation if homoglyphs detected         |
+| `asciiOnly`       | boolean          | `false` | Ensure output contains only ASCII              |
 
 #### Returns
 
@@ -147,17 +157,18 @@ Sanitizes and validates text for use as display names
 {
   text: string        // Sanitized text
   valid: boolean      // Whether validation passed
-  graphemeCount: number
-  error?: 'empty' | 'too_short' | 'too_long' | 'whitespace_only'
+  length: number
+  error?: 'empty' | 'too_short' | 'too_long' | 'whitespace_only' | 'homoglyphs' | 'disallowed_writing_system'
 }
 ```
 
 ### Individual Functions
 
-- `handleFlipped(text)` - Handles upside-down and mirrored text
-- `mapCharacters(text, options?)` - Maps Unicode to ASCII equivalents
+- `normalizeFlipped(text)` - Handles upside-down and mirrored text
+- `convertCharacters(text, options?)` - Maps Unicode to ASCII equivalents
 - `normalizeUnicode(text)` - Removes diacritics from Latin text
-- `removeDecorations(text, options?)` - Removes emojis and decorations
+- `normalizeDecorations(text, options?)` - Removes emojis and decorations
+- `decodeUnicodeId(text)` - Converts comma-separated code points to string
 - `normalizeSpaces(text, options?)` - Normalizes whitespace with trim control
 - `normalizeCasing(text)` - Normalizes inconsistent casing
 - `pipe(...fns)` - Composes functions into a pipeline
