@@ -14,18 +14,55 @@ import { REGIONAL_INDICATORS_MAP } from './maps/REGIONAL_INDICATORS_MAP'
 import { PARENTHESIZED_MAP } from './maps/PARENTHESIZED_MAP'
 import { MISCELLANEOUS_MAP } from './maps/MISCELLANEOUS_MAP'
 
-export type WritingSystem = 'greek' | 'cyrillic' | 'arabic' | 'hebrew' | 'cjk' | 'ethiopic' | 'thai' | 'devanagari' | 'latin'
+export type WritingSystem =
+  | 'greek'
+  | 'cyrillic'
+  | 'arabic'
+  | 'hebrew'
+  | 'cjk'
+  | 'ethiopic'
+  | 'thai'
+  | 'devanagari'
+  | 'latin'
 
 export type PreserveOption = 'all' | WritingSystem[]
 
-export const WRITING_SYSTEMS: WritingSystem[] = ['greek', 'cyrillic', 'arabic', 'hebrew', 'cjk', 'ethiopic', 'thai', 'devanagari', 'latin']
+export const DEFAULT_PRESERVE_OPTION: PreserveOption = []
+
+export const WRITING_SYSTEMS: WritingSystem[] = [
+  'greek',
+  'cyrillic',
+  'arabic',
+  'hebrew',
+  'cjk',
+  'ethiopic',
+  'thai',
+  'devanagari',
+  'latin'
+]
 
 export const WRITING_SYSTEM_RANGES: Record<WritingSystem, [number, number][]> = {
-  greek: [[0x0370, 0x03ff], [0x1f00, 0x1fff]],
-  cyrillic: [[0x0400, 0x04ff], [0x0500, 0x052f]],
-  arabic: [[0x0600, 0x06ff], [0x0750, 0x077f], [0x08a0, 0x08ff]],
+  greek: [
+    [0x0370, 0x03ff],
+    [0x1f00, 0x1fff]
+  ],
+  cyrillic: [
+    [0x0400, 0x04ff],
+    [0x0500, 0x052f]
+  ],
+  arabic: [
+    [0x0600, 0x06ff],
+    [0x0750, 0x077f],
+    [0x08a0, 0x08ff]
+  ],
   hebrew: [[0x0590, 0x05ff]],
-  cjk: [[0x4e00, 0x9fff], [0x3400, 0x4dbf], [0x3040, 0x309f], [0x30a0, 0x30ff], [0xac00, 0xd7af]],
+  cjk: [
+    [0x4e00, 0x9fff],
+    [0x3400, 0x4dbf],
+    [0x3040, 0x309f],
+    [0x30a0, 0x30ff],
+    [0xac00, 0xd7af]
+  ],
   ethiopic: [[0x1200, 0x137f]],
   thai: [[0x0e00, 0x0e7f]],
   devanagari: [[0x0900, 0x097f]],

@@ -1,11 +1,11 @@
 import { decodeUnicodeId, isCodePointList } from './decodeUnicodeId'
-import { convertCharacters, PreserveOption } from './convertCharacters'
+import { convertCharacters, PreserveOption, DEFAULT_PRESERVE_OPTION } from './convertCharacters'
 import { normalizeCasing } from './normalizeCasing'
 import { normalizeDiacritics } from './normalizeDiacritics'
-import { normalizeDecorations } from './normalizeDecorations'
+import { normalizeDecorations, DEFAULT_SKIP_EMOJI } from './normalizeDecorations'
 import { pipeWith, when } from './pipe'
 import { validateInput } from './utils/validation'
-import { normalizeSpaces, TrimOption } from './normalizeSpaces'
+import { DEFAULT_TRIM_OPTION, DEFAULT_NORMALIZE_SPACES, normalizeSpaces, TrimOption } from './normalizeSpaces'
 import { normalizeFlipped } from './normalizeFlipped'
 
 export type ToPlainTextOptions = {
@@ -18,10 +18,10 @@ export type ToPlainTextOptions = {
 type Context = ToPlainTextOptions & { original: string }
 
 const DEFAULT_OPTIONS: ToPlainTextOptions = {
-  normalizeSpaces: true,
-  skipEmoji: false,
-  preserve: [],
-  trim: 'all'
+  normalizeSpaces: DEFAULT_NORMALIZE_SPACES,
+  skipEmoji: DEFAULT_SKIP_EMOJI,
+  preserve: DEFAULT_PRESERVE_OPTION,
+  trim: DEFAULT_TRIM_OPTION
 }
 
 /**

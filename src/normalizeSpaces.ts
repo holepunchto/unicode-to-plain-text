@@ -1,5 +1,18 @@
 export type TrimOption = 'all' | 'start' | 'end' | 'none'
 
+export type TrimConfig = {
+  trimStart: boolean
+  trimEnd: boolean
+}
+
+export const DEFAULT_TRIM_OPTION: TrimOption = 'all'
+export const DEFAULT_NORMALIZE_SPACES = true
+
+export const getTrimConfig = (trim: TrimOption = DEFAULT_TRIM_OPTION): TrimConfig => ({
+  trimStart: ['all', 'start'].includes(trim),
+  trimEnd: ['all', 'end'].includes(trim)
+})
+
 export type NormalizeSpacesOptions = {
   trim?: TrimOption
 }
@@ -35,8 +48,7 @@ export const normalizeSpaces = <Options extends NormalizeSpacesOptions>(
   text: string,
   options?: Options
 ): string => {
-  const trimStart = options?.trim === 'all' || options?.trim === 'start' || options?.trim === undefined
-  const trimEnd = options?.trim === 'all' || options?.trim === 'end' || options?.trim === undefined
+  const { trimStart, trimEnd } = getTrimConfig(options?.trim)
 
   const result: string[] = []
   let lastWasSpace = false

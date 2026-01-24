@@ -5,6 +5,7 @@ import { OTHER_DECORATIONS, isEmoji } from './maps/DECORATIVE_CHARS'
  * 0.4 = 40% → means >60% was decoration.
  */
 const SPAM_RATIO_THRESHOLD = 0.4
+export const DEFAULT_SKIP_EMOJI = false
 
 export type NormalizeDecorationsOptions = {
   skipEmoji?: boolean

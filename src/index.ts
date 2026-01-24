@@ -1,11 +1,9 @@
 // Export types
 export type { WritingSystem, PreserveOption } from './convertCharacters'
 export type { ToPlainTextOptions } from './toPlainText'
-export type { SanitizeOptions, SanitizeResult, SanitizeError } from './sanitize'
 
 // Export main functions
 export { toPlainText } from './toPlainText'
-export { sanitize } from './sanitize'
 
 // Export individual transformation functions
 export { decodeUnicodeId } from './decodeUnicodeId'
