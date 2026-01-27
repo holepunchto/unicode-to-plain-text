@@ -9,6 +9,7 @@
 const EMOJI_RANGES: readonly [number, number][] = [
   [0x1f300, 0x1f9ff], // Miscellaneous Symbols and Pictographs, Emoticons, etc.
   [0x1fa00, 0x1faff], // Supplemental Symbols and Pictographs
+  [0x1f1e6, 0x1f1ff], // Regional Indicator Symbols (country flags)
   [0x2600, 0x26ff], // Miscellaneous Symbols (☀️⚠️❤️ etc.)
   [0x2700, 0x27bf], // Dingbats (✅❌✨ etc.)
   [0x2300, 0x23ff], // Miscellaneous Technical (⌚ etc.)

@@ -13,6 +13,7 @@ import { DARK_SQUARES_MAP } from './maps/DARK_SQUARES_MAP'
 import { REGIONAL_INDICATORS_MAP } from './maps/REGIONAL_INDICATORS_MAP'
 import { PARENTHESIZED_MAP } from './maps/PARENTHESIZED_MAP'
 import { MISCELLANEOUS_MAP } from './maps/MISCELLANEOUS_MAP'
+import { isEmoji } from './maps/DECORATIVE_CHARS'
 
 export type WritingSystem =
   | 'greek'
@@ -79,6 +80,7 @@ export const isInRanges = (code: number, ranges: [number, number][]): boolean =>
 
 export type ConvertCharactersOptions = {
   preserve?: PreserveOption
+  skipEmoji?: boolean
 }
 
 /**
@@ -87,10 +89,15 @@ export type ConvertCharactersOptions = {
  */
 export const convertCharacters = (text: string, options?: ConvertCharactersOptions): string => {
   const preserveSet = buildPreserveSet(options?.preserve)
+  const skipEmoji = options?.skipEmoji ?? false
   const map = getCharacterLookup()
 
   return Array.from(text)
-    .map((char) => (preserveSet.has(char) ? char : (map.get(char) ?? char)))
+    .map((char) => {
+      if (preserveSet.has(char)) return char
+      if (skipEmoji && isEmoji(char)) return char
+      return map.get(char) ?? char
+    })
     .join('')
 }
 

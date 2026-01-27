@@ -422,3 +422,38 @@ test('Options - asciiOnly default is false', (t) => {
     t.is(toPlainText('Hello 你好'), 'Hello 你好', 'non-Latin preserved by default')
 })
 
+// ============================================================================
+// FLAG EMOJI BUG - skipEmoji should preserve country flags
+// ============================================================================
+
+test('Options - skipEmoji preserves country flag emojis (regional indicators)', (t) => {
+    t.is(toPlainText('USA 🇺🇸', { skipEmoji: true }), 'USA 🇺🇸', 'preserves US flag')
+    t.is(toPlainText('🇬🇧 Britain', { skipEmoji: true }), '🇬🇧 Britain', 'preserves UK flag')
+    t.is(toPlainText('🇯🇵 Japan 🇰🇷 Korea', { skipEmoji: true }), '🇯🇵 Japan 🇰🇷 Korea', 'preserves multiple flags')
+    t.is(toPlainText('🇫🇷🇩🇪🇮🇹', { skipEmoji: true }), '🇫🇷🇩🇪🇮🇹', 'preserves adjacent flags')
+    t.is(toPlainText('Travel: 🇪🇸 → 🇵🇹', { skipEmoji: true }), 'Travel: 🇪🇸 🇵🇹', 'preserves flags with arrow (arrow removed)')
+})
+
+test('Options - skipEmoji preserves flags mixed with other emojis', (t) => {
+    t.is(toPlainText('Hello 👋 from 🇺🇸', { skipEmoji: true }), 'Hello 👋 from 🇺🇸', 'wave + flag')
+    t.is(toPlainText('🎉 Party in 🇧🇷! 🎊', { skipEmoji: true }), '🎉 Party in 🇧🇷! 🎊', 'celebration + flag')
+    t.is(toPlainText('🇨🇦 ❤️ maple', { skipEmoji: true }), '🇨🇦 ❤️ maple', 'flag + heart')
+})
+
+test('Options - skipEmoji false still converts flags to letters', (t) => {
+    t.is(toPlainText('🇺🇸'), 'US', 'US flag becomes US')
+    t.is(toPlainText('🇬🇧'), 'GB', 'GB flag becomes GB')
+    t.is(toPlainText('🇯🇵'), 'JP', 'JP flag becomes JP')
+})
+
+test('Options - skipEmoji with flags and fancy text', (t) => {
+    t.is(toPlainText('𝐇𝐞𝐥𝐥𝐨 🇺🇸', { skipEmoji: true }), 'Hello 🇺🇸', 'converts fancy text, preserves flag')
+    t.is(toPlainText('🇫🇷 ⓟⓐⓡⓘⓢ', { skipEmoji: true }), '🇫🇷 paris', 'preserves flag, converts circled')
+})
+
+test('Options - skipEmoji with flags and preserve option', (t) => {
+    t.is(toPlainText('🇺🇦 Київ', { skipEmoji: true, preserve: 'all' }), '🇺🇦 Київ', 'flag + Cyrillic preserved')
+    t.is(toPlainText('🇨🇳 北京', { skipEmoji: true, preserve: 'all' }), '🇨🇳 北京', 'flag + Chinese preserved')
+    t.is(toPlainText('🇯🇵 東京 Tokyo', { skipEmoji: true, preserve: 'all' }), '🇯🇵 東京 Tokyo', 'flag + Japanese + Latin')
+})
+
