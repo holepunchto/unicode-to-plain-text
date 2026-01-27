@@ -59,7 +59,7 @@ import {
   pipe,
   normalizeFlipped,
   convertCharacters,
-  normalizeUnicode,
+  normalizeDiacritics,
   normalizeDecorations,
   normalizeCasing
 } from 'unicode-to-plain-text'
@@ -68,7 +68,7 @@ import {
 const customTransform = pipe(
   normalizeFlipped,
   convertCharacters,
-  normalizeUnicode,
+  normalizeDiacritics,
   normalizeDecorations
 )
 
@@ -94,6 +94,7 @@ Converts fancy Unicode text to plain ASCII
 | `skipEmoji`       | boolean        | `false` | Preserve emoji characters                                |
 | `preserve`        | PreserveOption | `[]`    | Writing systems to preserve: `'all'` or array            |
 | `trim`            | TrimOption     | `'all'` | Trim mode: `'all'`, `'start'`, `'end'`, or `'none'`      |
+| `asciiOnly`       | boolean        | `false` | Strip all non-ASCII characters after normalization       |
 
 **PreserveOption**: `'all'` | `WritingSystem[]`
 
@@ -146,7 +147,7 @@ Sanitizes and validates text for use as display names
 | `preserve`        | WritingSystem[]  | -       | Writing systems to preserve                    |
 | `skipEmoji`       | boolean          | `false` | Preserve emoji characters                      |
 | `trim`            | TrimOption       | `'all'` | Trim mode                                      |
-| `truncate`        | boolean          | `false` | Auto-truncate to maxLength instead of error |
+| `truncate`        | boolean          | `false` | Auto-truncate to maxLength instead of error    |
 | `allowedWritingSystems`  | WritingSystem[]  | -       | Strict whitelist of allowed writing systems            |
 | `rejectHomoglyphs`| boolean          | `false` | Fail validation if homoglyphs detected         |
 | `asciiOnly`       | boolean          | `false` | Ensure output contains only ASCII              |
@@ -162,11 +163,19 @@ Sanitizes and validates text for use as display names
 }
 ```
 
+### Detection Utilities
+
+- `detectWritingSystems(text)` - Returns `{ writingSystems: WritingSystem[], mixed: boolean, primary: WritingSystem | null }`
+- `getWritingSystem(char)` - Returns the writing system for a single character
+- `hasHomoglyphs(text)` - Checks if text contains cross-script visually confusable characters
+- `analyzeHomoglyphs(text)` - Returns detailed analysis of homoglyph matches
+- `isSuspiciousMix(text)` - Checks for Latin + Cyrillic/Greek mixing (common spoofing)
+
 ### Individual Functions
 
 - `normalizeFlipped(text)` - Handles upside-down and mirrored text
 - `convertCharacters(text, options?)` - Maps Unicode to ASCII equivalents
-- `normalizeUnicode(text)` - Removes diacritics from Latin text
+- `normalizeDiacritics(text)` - Removes diacritics from Latin text
 - `normalizeDecorations(text, options?)` - Removes emojis and decorations
 - `decodeUnicodeId(text)` - Converts comma-separated code points to string
 - `normalizeSpaces(text, options?)` - Normalizes whitespace with trim control

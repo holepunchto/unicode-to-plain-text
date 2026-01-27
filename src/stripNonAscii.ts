@@ -46,7 +46,6 @@ export const stripNonAscii = <Options extends StripNonAsciiOptions>(
     }
   }
 
-  // Remove trailing whitespace if needed
   if (trimEnd) {
     while (result.length > 0) {
       const last = result[result.length - 1]
@@ -60,15 +59,4 @@ export const stripNonAscii = <Options extends StripNonAsciiOptions>(
   }
 
   return result.join('')
-}
-
-/**
- * Checks if a string contains only ASCII characters.
- */
-export const isAscii = (text: string): boolean => {
-  for (const char of text) {
-    const code = char.codePointAt(0)
-    if (code === undefined || code > 0x7f) return false
-  }
-  return true
 }

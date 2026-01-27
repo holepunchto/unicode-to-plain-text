@@ -45,6 +45,10 @@ export const sanitize = (text: string, options?: SanitizeOptions): SanitizeResul
   const minLength = options?.minLength ?? DEFAULT_MIN_LENGTH
   const maxLength = options?.maxLength ?? DEFAULT_MAX_LENGTH
 
+  if (input.length === 0) {
+    return { text: '', valid: false, length: 0, error: 'empty' }
+  }
+
   // Check for homoglyphs before any transformation
   if (options?.rejectHomoglyphs && hasHomoglyphs(input)) {
     return { text: input, valid: false, length: input.length, error: 'homoglyphs' }
@@ -65,10 +69,6 @@ export const sanitize = (text: string, options?: SanitizeOptions): SanitizeResul
     if (disallowed.length > 0) {
       return { text: result, valid: false, length: result.length, error: 'disallowed_writing_system' }
     }
-  }
-
-  if (input.length === 0) {
-    return { text: '', valid: false, length: 0, error: 'empty' }
   }
 
   if (result.length === 0) {

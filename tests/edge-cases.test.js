@@ -1,25 +1,6 @@
 const test = require('brittle')
-const { isAsciiOnly } = require('../dist/isAsciiOnly.js')
 const { normalizeCasing } = require('../dist/normalizeCasing.js')
 const { normalizeDecorations } = require('../dist/normalizeDecorations.js')
-
-test('isAsciiOnly - boundaries', (t) => {
-  t.is(isAsciiOnly('\x7f'), true, 'char 127 (DEL)')
-  t.is(isAsciiOnly('\x80'), false, 'char 128')
-  t.is(isAsciiOnly('\x00'), true, 'char 0 (NULL)')
-  t.is(isAsciiOnly(' !"#$%&'), true, 'printable ASCII')
-})
-
-test('isAsciiOnly - mixed content', (t) => {
-  t.is(isAsciiOnly('Hello World'), true, 'pure ASCII')
-  t.is(isAsciiOnly('test\u0100'), false, 'ASCII + Unicode')
-  t.is(isAsciiOnly(''), true, 'empty string')
-})
-
-test('isAsciiOnly - edge cases', (t) => {
-  t.is(isAsciiOnly('test\t\ntext'), true, 'tabs and newlines')
-  t.is(isAsciiOnly('café'), false, 'extended ASCII')
-})
 
 test('normalizeCasing - thresholds', (t) => {
   t.is(normalizeCasing('AAAa'), 'AAAA', '75% uppercase → all upper')
