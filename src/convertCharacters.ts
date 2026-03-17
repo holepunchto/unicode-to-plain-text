@@ -86,8 +86,6 @@ export type ConvertCharactersOptions = {
 
 export const DEFAULT_SKIP_CURRENCY_MAP = false
 
-const CURRENCY_CHARS = new Set(Object.keys(CURRENCY_MAP))
-
 /**
  * Maps fancy Unicode characters to plain ASCII.
  * @example: convertCharacters('𝐇𝐞𝐥𝐥𝐨', { preserve: ['cyrillic'] }) → 'Hello'
