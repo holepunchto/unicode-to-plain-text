@@ -11,6 +11,7 @@ export type SanitizeOptions = {
   preserve?: PreserveOption
   skipEmoji?: boolean
   skipEmoticonPunctuation?: boolean
+  skipCurrencyMap?: boolean
   trim?: TrimOption
   truncate?: boolean
   allowedWritingSystems?: WritingSystem[]
@@ -59,6 +60,7 @@ export const sanitize = (text: string, options?: SanitizeOptions): SanitizeResul
     normalizeSpaces: true,
     skipEmoji: options?.skipEmoji,
     skipEmoticonPunctuation: options?.skipEmoticonPunctuation,
+    skipCurrencyMap: options?.skipCurrencyMap,
     preserve: options?.preserve,
     trim: options?.trim,
     asciiOnly: options?.asciiOnly
