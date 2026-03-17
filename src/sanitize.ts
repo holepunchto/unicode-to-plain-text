@@ -10,6 +10,7 @@ export type SanitizeOptions = {
   maxLength?: number
   preserve?: PreserveOption
   skipEmoji?: boolean
+  skipEmoticonPunctuation?: boolean
   trim?: TrimOption
   truncate?: boolean
   allowedWritingSystems?: WritingSystem[]
@@ -57,6 +58,7 @@ export const sanitize = (text: string, options?: SanitizeOptions): SanitizeResul
   let result = toPlainText(input, {
     normalizeSpaces: true,
     skipEmoji: options?.skipEmoji,
+    skipEmoticonPunctuation: options?.skipEmoticonPunctuation,
     preserve: options?.preserve,
     trim: options?.trim,
     asciiOnly: options?.asciiOnly
@@ -67,7 +69,12 @@ export const sanitize = (text: string, options?: SanitizeOptions): SanitizeResul
     const { writingSystems } = detectWritingSystems(result)
     const disallowed = writingSystems.filter((s) => !options.allowedWritingSystems!.includes(s))
     if (disallowed.length > 0) {
-      return { text: result, valid: false, length: result.length, error: 'disallowed_writing_system' }
+      return {
+        text: result,
+        valid: false,
+        length: result.length,
+        error: 'disallowed_writing_system'
+      }
     }
   }
 
@@ -90,4 +97,3 @@ export const sanitize = (text: string, options?: SanitizeOptions): SanitizeResul
 
   return { text: result, valid: true, length: result.length }
 }
-

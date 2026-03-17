@@ -34,7 +34,8 @@ export const BOX_BLOCKS = '░▒▓█▀▄▌▐▖▞▚▅⯊◀◗◣◤�
 export const CHESS_PIECES = '♔♕♖♗♘♙♚♛♜♝♞♟'
 export const BOX_DRAWING_LINES = '┃━┏┓┗┛├┤┬┴┼╋═║╔╗╚╝╠╣╦╩╬'
 export const ARROWS_SYMBOLS = '↳↔↕➔►◗☡☭☋☿☈♗♭→'
-export const EMOTICON_PUNCTUATION = 'ʘ·¯´`().,'
+export const EMOTICON_SYMBOLS = 'ʘ·¯'
+export const EMOTICON_PUNCTUATION = '´`().,'
 export const STARS_DECORATIVE = '※★☆✦✧✴✶✷✸✹✺'
 export const MUSIC_DECORATIVE = '♪♫'
 
@@ -69,6 +70,7 @@ const EXPLICIT_DECORATIONS = [
   CHESS_PIECES,
   BOX_DRAWING_LINES,
   ARROWS_SYMBOLS,
+  EMOTICON_SYMBOLS,
   EMOTICON_PUNCTUATION,
   STARS_DECORATIVE,
   MUSIC_DECORATIVE
