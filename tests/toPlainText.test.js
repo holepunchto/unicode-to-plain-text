@@ -457,3 +457,62 @@ test('Options - skipEmoji with flags and preserve option', (t) => {
     t.is(toPlainText('🇯🇵 東京 Tokyo', { skipEmoji: true, preserve: 'all' }), '🇯🇵 東京 Tokyo', 'flag + Japanese + Latin')
 })
 
+// ============================================================================
+// SKIP CURRENCY MAP
+// ============================================================================
+
+test('Options - skipCurrencyMap false (default) converts currency symbols', (t) => {
+    t.is(toPlainText('€100'), 'E100', 'euro sign converted')
+    t.is(toPlainText('£50'), 'L50', 'pound sign converted')
+    t.is(toPlainText('¥200'), 'Y200', 'yen sign converted')
+    t.is(toPlainText('$10'), 'S10', 'dollar sign converted')
+    t.is(toPlainText('฿price'), 'Bprice', 'baht sign converted')
+    t.is(toPlainText('price ₹500', { skipCurrencyMap: false }), 'price R500', 'rupee sign converted when explicitly false')
+})
+
+test('Options - skipCurrencyMap true preserves currency symbols', (t) => {
+    t.is(toPlainText('€100', { skipCurrencyMap: true }), '€100', 'euro sign preserved')
+    t.is(toPlainText('£50', { skipCurrencyMap: true }), '£50', 'pound sign preserved')
+    t.is(toPlainText('¥200', { skipCurrencyMap: true }), '¥200', 'yen sign preserved')
+    t.is(toPlainText('$10', { skipCurrencyMap: true }), '$10', 'dollar sign preserved')
+    t.is(toPlainText('price ₹500', { skipCurrencyMap: true }), 'price ₹500', 'rupee sign preserved')
+})
+
+test('Options - skipCurrencyMap with fancy text', (t) => {
+    t.is(toPlainText('𝐩𝐫𝐢𝐜𝐞 €100', { skipCurrencyMap: true }), 'price €100', 'converts fancy text but preserves currency')
+    t.is(toPlainText('𝐩𝐫𝐢𝐜𝐞 €100'), 'price E100', 'converts both fancy text and currency by default')
+})
+
+test('Options - skipCurrencyMap combined with skipEmoji', (t) => {
+    t.is(toPlainText('💰 €100 profit', { skipCurrencyMap: true, skipEmoji: true }), '💰 €100 profit', 'both preserved')
+    t.is(toPlainText('💰 €100 profit', { skipCurrencyMap: true }), '€100 profit', 'emoji removed, currency preserved')
+})
+
+// ============================================================================
+// SKIP EMOTICON PUNCTUATION
+// ============================================================================
+
+test('Options - skipEmoticonPunctuation false (default) removes punctuation', (t) => {
+    t.is(toPlainText('(hello)'), 'hello', 'parentheses removed')
+    t.is(toPlainText('hello,world'), 'helloworld', 'comma removed')
+    t.is(toPlainText('hello.world'), 'helloworld', 'period removed')
+    t.is(toPlainText('(hello)', { skipEmoticonPunctuation: false }), 'hello', 'parentheses removed when explicitly false')
+})
+
+test('Options - skipEmoticonPunctuation true preserves punctuation', (t) => {
+    t.is(toPlainText('(hello)', { skipEmoticonPunctuation: true }), '(hello)', 'parentheses preserved')
+    t.is(toPlainText('hello,world', { skipEmoticonPunctuation: true }), 'hello,world', 'comma preserved')
+    t.is(toPlainText('hello.world', { skipEmoticonPunctuation: true }), 'hello.world', 'period preserved')
+    t.is(toPlainText('(a,b)', { skipEmoticonPunctuation: true }), '(a,b)', 'mixed punctuation preserved')
+})
+
+test('Options - skipEmoticonPunctuation with fancy text', (t) => {
+    t.is(toPlainText('(𝐡𝐞𝐥𝐥𝐨)', { skipEmoticonPunctuation: true }), '(hello)', 'converts fancy text, preserves parentheses')
+    t.is(toPlainText('(𝐡𝐞𝐥𝐥𝐨)'), 'hello', 'removes parentheses and converts fancy text by default')
+})
+
+test('Options - skipEmoticonPunctuation combined with skipEmoji', (t) => {
+    t.is(toPlainText('(hello 🎉)', { skipEmoticonPunctuation: true, skipEmoji: true }), '(hello 🎉)', 'both preserved')
+    t.is(toPlainText('(hello🎉)', { skipEmoticonPunctuation: true }), '(hello)', 'emoji removed, punctuation preserved')
+})
+

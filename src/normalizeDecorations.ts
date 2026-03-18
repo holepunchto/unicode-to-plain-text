@@ -1,4 +1,4 @@
-import { OTHER_DECORATIONS, isEmoji } from './maps/DECORATIVE_CHARS'
+import { OTHER_DECORATIONS, EMOTICON_PUNCTUATION, isEmoji } from './maps/DECORATIVE_CHARS'
 
 /**
  * Threshold: if cleaned text is less than this fraction of original → treat as spam.
@@ -6,9 +6,11 @@ import { OTHER_DECORATIONS, isEmoji } from './maps/DECORATIVE_CHARS'
  */
 const SPAM_RATIO_THRESHOLD = 0.4
 export const DEFAULT_SKIP_EMOJI = false
+export const DEFAULT_SKIP_EMOTICON_PUNCTUATION = false
 
 export type NormalizeDecorationsOptions = {
   skipEmoji?: boolean
+  skipEmoticonPunctuation?: boolean
 }
 
 /**
@@ -17,9 +19,13 @@ export type NormalizeDecorationsOptions = {
  * @example normalizeDecorations("Hello ✨ world ★") → "Hello  world "
  * @example normalizeDecorations("Hello 🎉 world", { skipEmoji: true }) → "Hello 🎉 world"
  */
-export const normalizeDecorations = (text: string, options?: NormalizeDecorationsOptions): string => {
+export const normalizeDecorations = (
+  text: string,
+  options?: NormalizeDecorationsOptions
+): string => {
   const cleaned = [...text]
     .filter((char) => {
+      if (options?.skipEmoticonPunctuation && EMOTICON_PUNCTUATION.includes(char)) return true
       // Always remove non-emoji decorations
       if (OTHER_DECORATIONS.has(char)) return false
 

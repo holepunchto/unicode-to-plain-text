@@ -1,17 +1,28 @@
 import { decodeUnicodeId, isCodePointList } from './decodeUnicodeId'
-import { convertCharacters, PreserveOption, DEFAULT_PRESERVE_OPTION } from './convertCharacters'
+import { convertCharacters, PreserveOption, DEFAULT_PRESERVE_OPTION, DEFAULT_SKIP_CURRENCY_MAP } from './convertCharacters'
 import { normalizeCasing } from './normalizeCasing'
 import { normalizeDiacritics } from './normalizeDiacritics'
-import { normalizeDecorations, DEFAULT_SKIP_EMOJI } from './normalizeDecorations'
+import {
+  normalizeDecorations,
+  DEFAULT_SKIP_EMOJI,
+  DEFAULT_SKIP_EMOTICON_PUNCTUATION
+} from './normalizeDecorations'
 import { pipeWith, when } from './pipe'
 import { validateInput } from './utils/validation'
-import { DEFAULT_TRIM_OPTION, DEFAULT_NORMALIZE_SPACES, normalizeSpaces, TrimOption } from './normalizeSpaces'
+import {
+  DEFAULT_TRIM_OPTION,
+  DEFAULT_NORMALIZE_SPACES,
+  normalizeSpaces,
+  TrimOption
+} from './normalizeSpaces'
 import { normalizeFlipped } from './normalizeFlipped'
 import { stripNonAscii, DEFAULT_ASCII_ONLY } from './stripNonAscii'
 
 export type ToPlainTextOptions = {
   normalizeSpaces?: boolean
   skipEmoji?: boolean
+  skipEmoticonPunctuation?: boolean
+  skipCurrencyMap?: boolean
   preserve?: PreserveOption
   trim?: TrimOption
   asciiOnly?: boolean
@@ -21,7 +32,9 @@ type Context = ToPlainTextOptions & { original: string }
 
 const DEFAULT_OPTIONS: ToPlainTextOptions = {
   normalizeSpaces: DEFAULT_NORMALIZE_SPACES,
+  skipEmoticonPunctuation: DEFAULT_SKIP_EMOTICON_PUNCTUATION,
   skipEmoji: DEFAULT_SKIP_EMOJI,
+  skipCurrencyMap: DEFAULT_SKIP_CURRENCY_MAP,
   preserve: DEFAULT_PRESERVE_OPTION,
   trim: DEFAULT_TRIM_OPTION,
   asciiOnly: DEFAULT_ASCII_ONLY
@@ -43,7 +56,6 @@ export const toPlainText = (text: string, options?: ToPlainTextOptions): string 
     ...(options || {}),
     original: validated
   }
-
   return pipeWith<string, Context>(
     normalizeFlipped,
     convertCharacters,

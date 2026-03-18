@@ -81,7 +81,10 @@ export const isInRanges = (code: number, ranges: [number, number][]): boolean =>
 export type ConvertCharactersOptions = {
   preserve?: PreserveOption
   skipEmoji?: boolean
+  skipCurrencyMap?: boolean
 }
+
+export const DEFAULT_SKIP_CURRENCY_MAP = false
 
 /**
  * Maps fancy Unicode characters to plain ASCII.
@@ -90,12 +93,14 @@ export type ConvertCharactersOptions = {
 export const convertCharacters = (text: string, options?: ConvertCharactersOptions): string => {
   const preserveSet = buildPreserveSet(options?.preserve)
   const skipEmoji = options?.skipEmoji ?? false
+  const skipCurrencyMap = options?.skipCurrencyMap ?? false
   const map = getCharacterLookup()
 
   return Array.from(text)
     .map((char) => {
       if (preserveSet.has(char)) return char
       if (skipEmoji && isEmoji(char)) return char
+      if (skipCurrencyMap && CURRENCY_MAP[char as keyof typeof CURRENCY_MAP]) return char
       return map.get(char) ?? char
     })
     .join('')
