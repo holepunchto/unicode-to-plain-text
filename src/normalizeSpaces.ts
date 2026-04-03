@@ -28,13 +28,60 @@ const isInvisible = (char: string): boolean => {
   if (code === 0x7f) return true
   if (code >= 0x80 && code <= 0x9f) return true
 
+  // Soft hyphen
+  if (code === 0x00ad) return true
+
+  // Arabic format characters (Cf)
+  if (code >= 0x0600 && code <= 0x0605) return true
+  if (code === 0x061c) return true
+  if (code === 0x06dd) return true
+
+  // Syriac abbreviation mark
+  if (code === 0x070f) return true
+
+  // Hangul Choseong / Jungseong Fillers
+  if (code === 0x115f || code === 0x1160) return true
+
+  // Khmer Vowel Inherent characters
+  if (code === 0x17b4 || code === 0x17b5) return true
+
+  // Mongolian Free Variation Selectors + Vowel Separator
+  if (code >= 0x180b && code <= 0x180e) return true
+
   // Zero-width characters (except ZWJ 0x200D for emoji)
   if (code >= 0x200b && code <= 0x200f) return code !== 0x200d
 
-  // Format characters
+  // Directional formatting + deprecated format characters
   if (code >= 0x202a && code <= 0x202e) return true
-  if (code >= 0x2060 && code <= 0x2069) return true
-  if (code === 0xfeff) return true
+  if (code >= 0x2060 && code <= 0x206f) return true
+
+  // Hangul Filler
+  if (code === 0x3164) return true
+
+  // BOM / Zero Width No-Break Space + reversed BOM
+  if (code === 0xfeff || code === 0xfffe) return true
+
+  // Interlinear annotation characters
+  if (code >= 0xfff9 && code <= 0xfffb) return true
+
+  // Halfwidth Hangul Filler
+  if (code === 0xffa0) return true
+
+  // Object Replacement Character
+  if (code === 0xfffc) return true
+
+  // Kaithi number sign
+  if (code === 0x110bd) return true
+
+  // Shorthand format controls
+  if (code >= 0x1bca0 && code <= 0x1bca3) return true
+
+  // Musical symbol enclosing marks
+  if (code >= 0x1d173 && code <= 0x1d17a) return true
+
+  // Language tag + tags block
+  if (code === 0xe0001) return true
+  if (code >= 0xe0020 && code <= 0xe007f) return true
 
   return false
 }
