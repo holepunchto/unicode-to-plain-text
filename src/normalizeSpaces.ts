@@ -39,14 +39,14 @@ const isInvisible = (char: string): boolean => {
   // Syriac abbreviation mark
   if (code === 0x070f) return true
 
-  // Hangul Choseong / Jungseong Fillers
+  // Hangul Choseong / Jungseong Fillers — category Lo but render as blank glyphs
   if (code === 0x115f || code === 0x1160) return true
 
   // Khmer Vowel Inherent characters
   if (code === 0x17b4 || code === 0x17b5) return true
 
-  // Mongolian Free Variation Selectors + Vowel Separator
-  if (code >= 0x180b && code <= 0x180e) return true
+  // Mongolian Vowel Separator — variation selectors 0x180B-0x180D affect glyph shape and must be preserved
+  if (code === 0x180e) return true
 
   // Zero-width characters (except ZWJ 0x200D for emoji)
   if (code >= 0x200b && code <= 0x200f) return code !== 0x200d
@@ -67,7 +67,7 @@ const isInvisible = (char: string): boolean => {
   // Halfwidth Hangul Filler
   if (code === 0xffa0) return true
 
-  // Object Replacement Character
+  // Object Replacement Character — placeholder for embedded objects in rich text; meaningless in plain text
   if (code === 0xfffc) return true
 
   // Kaithi number sign
@@ -124,4 +124,3 @@ export const normalizeSpaces = <Options extends NormalizeSpacesOptions>(
 
   return result.join('')
 }
-
