@@ -1,0 +1,81 @@
+name: 🚀 Publish release
+run-name: ${{ inputs.bumpVersion == 'none' && 'Re-try making a new release' || format('Release a new {0} version', inputs.bumpVersion) }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      bumpVersion:
+        type: choice
+        description: Select version to bump
+        default: none
+        options:
+          - none
+          - patch
+          - minor
+          - major
+          - prerelease
+
+# Least-privilege GITHUB_TOKEN scopes for this workflow:
+#   contents: write - push the version-bump commit + tag, create the GitHub Release
+#   id-token: write - mint the OIDC token for npm trusted publishing (provenance)
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    name: Release a new version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Configure Git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm
+        # npm trusted publishing (OIDC) requires npm >= 11.5.1
+        run: npm install --global npm@latest
+
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: npm install
+
+      - name: Bump version
+        if: ${{ inputs.bumpVersion != 'none' }}
+        env:
+          BUMP_VERSION: ${{ inputs.bumpVersion }}
+        run: |
+          npm version "$BUMP_VERSION"
+          git push --follow-tags
+
+      - name: Publish to npm
+        # Auth and provenance come from OIDC trusted publishing - no NODE_AUTH_TOKEN.
+        # A trusted publisher for this workflow must be configured on npmjs.com first.
+        run: |
+          version=$(npm pkg get version | tr -d '"')
+          if [[ "$version" == *-* ]]; then
+            npm publish --tag prerelease
+          else
+            npm publish
+          fi
+
+      - name: Publish GitHub Release
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version=$(npm pkg get version | tr -d '"')
+          gh release create "v$version" --title "v$version" --generate-notes
