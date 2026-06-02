@@ -9,6 +9,7 @@ export type { TrimOption, NormalizeSpacesOptions } from './normalizeSpaces'
 // Export main functions
 export { toPlainText } from './toPlainText'
 export { sanitize } from './sanitize'
+export { stripBoxChars } from './stripBoxChars'
 
 // Export individual transformation functions
 export { decodeUnicodeId } from './decodeUnicodeId'
