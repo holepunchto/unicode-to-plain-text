@@ -130,3 +130,24 @@ test('stripBoxChars - mixed content', (t) => {
   t.is(stripBoxChars('Hello𝀀World'), 'HelloWorld', 'strips inline box char')
   t.is(stripBoxChars('test𛀀𝈀end'), 'testend', 'strips multiple box chars')
 })
+
+test('stripBoxChars - lone surrogates stripped', (t) => {
+  t.is(stripBoxChars('\uD800'), '', 'lone high surrogate stripped')
+  t.is(stripBoxChars('\uDFFF'), '', 'lone low surrogate stripped')
+  t.is(stripBoxChars('a\uD800b'), 'ab', 'lone surrogate in middle stripped')
+})
+
+test('stripBoxChars - supplementary PUA stripped', (t) => {
+  t.is(stripBoxChars('\u{F0000}'), '', 'Supplementary PUA-A stripped')
+  t.is(stripBoxChars('\u{100000}'), '', 'Supplementary PUA-B stripped')
+})
+
+test('stripBoxChars - Small Kana Extension stripped', (t) => {
+  t.is(stripBoxChars('\u{1B132}'), '', 'Small Kana Extension U+1B132 stripped')
+  t.is(stripBoxChars('\u{1B150}'), '', 'Small Kana Extension U+1B150 stripped')
+})
+
+test('stripBoxChars - Musical Symbols lower range kept (renders on iOS)', (t) => {
+  t.is(stripBoxChars('𝄞'), '𝄞', 'treble clef U+1D11E kept')
+  t.is(stripBoxChars('𝄢'), '𝄢', 'bass clef U+1D122 kept')
+})

@@ -1,4 +1,7 @@
+import { isInRanges } from './convertCharacters'
+
 const STRIP_RANGES: [number, number][] = [
+  [0xD800, 0xDFFF],   // Lone surrogates (invalid in well-formed Unicode)
   [0xE000, 0xF8FF],   // Private Use Area (BMP)
 
   // Ancient / undeciphered scripts
@@ -37,14 +40,15 @@ const STRIP_RANGES: [number, number][] = [
   // Tangut, Khitan
   [0x17000, 0x18D7F], // Tangut, Tangut Components, Khitan Small Script, Tangut Supplement
 
-  // Historical Japanese kana
-  [0x1AFF0, 0x1B12F], // Kana Extended-B, Kana Supplement, Kana Extended-A
-  [0x1B170, 0x1B2FF], // Nushu
+  // Historical Japanese kana (including Small Kana Extension gap U+1B130–U+1B16F)
+  [0x1AFF0, 0x1B2FF], // Kana Extended-B, Kana Supplement, Kana Extended-A, Small Kana Extension, Nushu
 
   // Legacy computing symbols
   [0x1CC00, 0x1CEBF], // Symbols for Legacy Computing Supplement
 
   // Musical notation
+  // Note: U+1D100–U+1D1E7 (Musical Symbols lower) is intentionally kept —
+  // common glyphs like treble clef (U+1D11E) and bass clef (U+1D122) render on iOS.
   [0x1CF00, 0x1CFCF], // Znamenny Musical Notation
   [0x1D000, 0x1D0FF], // Byzantine Musical Symbols
   [0x1D1E8, 0x1D24F], // Musical Symbols (upper) + Ancient Greek Musical Notation
@@ -64,13 +68,13 @@ const STRIP_RANGES: [number, number][] = [
   [0x1F800, 0x1F8FF], // Supplemental Arrows-C
   [0x1FA00, 0x1FA6F], // Chess Symbols
   [0x1FBFB, 0x1FBFF], // Symbols for Legacy Computing (last 5 only)
-]
 
-const isRenderable = (cp: number): boolean =>
-  !STRIP_RANGES.some(([start, end]) => cp >= start && cp <= end)
+  // Supplementary Private Use Areas
+  [0xF0000, 0x10FFFF], // PUA-A and PUA-B
+]
 
 export const stripBoxChars = (text: string): string =>
   [...text].filter(c => {
     const cp = c.codePointAt(0)
-    return cp !== undefined && isRenderable(cp)
+    return cp !== undefined && !isInRanges(cp, STRIP_RANGES)
   }).join('')
