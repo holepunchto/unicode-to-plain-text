@@ -36,6 +36,16 @@ toPlainText('你好 𝐖𝐨𝐫𝐥𝐝', { preserve: ['cjk'] })       // => '�
 toPlainText('Α test')  // => 'A test' (Greek Alpha → Latin A)
 ```
 
+Strip characters that render as boxes in iOS notifications:
+
+```js
+import { stripBoxChars } from 'unicode-to-plain-text'
+
+stripBoxChars('Hello 𝇨 World')   // => 'Hello  World'   (musical symbol stripped)
+stripBoxChars('Hi مرحبا 🎉')     // => 'Hi مرحبا 🎉'    (Arabic and emoji kept)
+stripBoxChars('𝀀𝈀 test')        // => ' test'           (Byzantine/Greek musical stripped)
+```
+
 Sanitize user input:
 
 ```js
@@ -170,6 +180,19 @@ Sanitizes and validates text for use as display names
 - `hasHomoglyphs(text)` - Checks if text contains cross-script visually confusable characters
 - `analyzeHomoglyphs(text)` - Returns detailed analysis of homoglyph matches
 - `isSuspiciousMix(text)` - Checks for Latin + Cyrillic/Greek mixing (common spoofing)
+
+### stripBoxChars(text)
+
+Strips Unicode characters that render as rectangle boxes in iOS notifications. Safe for multilingual content — preserves Arabic, Thai, CJK, Cyrillic, Hebrew, Armenian, Hiragana, Hangul, emoji, and math alphanumeric symbols.
+
+```js
+stripBoxChars('Hello 𝇨 World')       // => 'Hello  World'
+stripBoxChars('مرحبا 🎉')            // => 'مرحبا 🎉'    (untouched)
+stripBoxChars('𝐇𝐞𝐥𝐥𝐨')             // => '𝐇𝐞𝐥𝐥𝐨'       (math bold kept)
+stripBoxChars('🟠🟡 status')         // => '🟠🟡 status'  (colored circles kept)
+```
+
+Stripped ranges include: Private Use Area, Byzantine/Ancient Greek Musical Symbols, Tangut, Khitan Small Script, historical Japanese kana (Kana Supplement/Extended), Sutton SignWriting, and 40+ other blocks confirmed unrenderable on iOS.
 
 ### Individual Functions
 
